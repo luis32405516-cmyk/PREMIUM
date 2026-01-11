@@ -1,0 +1,26 @@
+-- SCRIPT APARTE PARA WONDER CHASE (DUPLICADOR)
+local delayTime = 2 -- Segundos entre cada envío
+local running = true
+
+task.spawn(function()
+    while running do
+        local args = {
+            [1] = "LevelComplete",
+            [2] = 3,
+            [3] = {
+                ["CustomField01"] = "LevelCode: SHMF",
+                ["CustomField02"] = "Collectibles: 39"
+            }
+        }
+
+        -- Disparar el evento al servidor
+        pcall(function()
+            game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services"):WaitForChild("AnalyticsTrackerService"):WaitForChild("RF"):WaitForChild("CustomEvent"):InvokeServer(unpack(args))
+        end)
+
+        print("Puntos enviados, esperando " .. delayTime .. " segundos...")
+        task.wait(delayTime)
+    end
+end)
+
+-- Para detenerlo pon: running = false
