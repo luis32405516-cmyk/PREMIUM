@@ -19,6 +19,7 @@ local WalkSpeedValue = 16
 local targetLobby = ""
 local autoClicker = false
 local autoWin = false
+local autoTickets = false
 
 local function mobilefly()
     FLYING = true
@@ -77,6 +78,31 @@ if game.PlaceId == 14236123211 then
             while autoWin do
                 pcall(function() game:GetService("ReplicatedStorage").Events.PushEvent:FireServer(true) end)
                 task.wait(0.1)
+            end
+        end)
+    end)
+end
+
+if tostring(game.PlaceId) == "83347992878150" then
+    local TicketTab = Window:CreateTab("🎟️ TICKETS")
+    TicketTab:CreateSwitch("Auto Farm Tickets", function(s)
+        autoTickets = s
+        task.spawn(function()
+            while autoTickets do
+                local folder = workspace:FindFirstChild("SpinTicketFolder")
+                if folder then
+                    local tickets = {}
+                    for _, v in pairs(folder:GetChildren()) do
+                        if v.Name == "Ticket" and v:IsA("BasePart") then
+                            table.insert(tickets, v)
+                        end
+                    end
+                    if #tickets > 0 and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+                        local target = tickets[math.random(1, #tickets)]
+                        LP.Character.HumanoidRootPart.CFrame = target.CFrame
+                    end
+                end
+                task.wait(2)
             end
         end)
     end)
