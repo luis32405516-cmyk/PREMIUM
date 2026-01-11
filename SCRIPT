@@ -106,6 +106,9 @@ if tostring(game.PlaceId) == "83347992878150" then
             end
         end)
     end)
+    TicketTab:CreateButton("VOLVER AL LOBBY 🏠", function()
+        TeleportService:Teleport(13457104744, LP)
+    end)
 end
 
 local Vis = Window:CreateTab("👁️ VISUALES")
