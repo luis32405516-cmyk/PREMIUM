@@ -6,7 +6,7 @@ local fOpenUrl = openurl or (api_open_url)
 local TU_ID_AQUI = 9052854596
 local service = 18296
 local FILE_PATH = "LuisUNV_Key.txt" 
-local SCRIPT_URL = "https://raw.githubusercontent.com/luis32405516-cmyk/library.lua/refs/heads/main/Ray1"
+local SCRIPT_URL = "https://raw.githubusercontent.com/luis32405516-cmyk/PREMIUM/refs/heads/main/SCRIPT"
 
 local function verify(key)
     if not key or key == "" then return false end
