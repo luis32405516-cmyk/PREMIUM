@@ -33,7 +33,8 @@ local function mobilefly()
     local bg = Instance.new("BodyGyro", root)
     bg.Name = "IY_Gyro"
     bg.MaxTorque = Vector3.new(9e9,9e9,9e9)
-    bg.P = 1000
+    bg.P = 15000
+    bg.D = 100
     task.spawn(function()
         while FLYING do
             RS.RenderStepped:Wait()
