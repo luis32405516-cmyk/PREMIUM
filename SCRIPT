@@ -1,4 +1,4 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/luis32405516-cmyk/library.lua/refs/heads/main/Ray"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/luis32405516-cmyk/PREMIUM/refs/heads/main/LIBRARY"))()
 local Window = Library:CreateWindow()
 
 local Players = game:GetService("Players")
