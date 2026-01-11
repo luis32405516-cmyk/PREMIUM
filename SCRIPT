@@ -20,6 +20,7 @@ local targetLobby = ""
 local autoClicker = false
 local autoWin = false
 local autoTickets = false
+local RainbowPlatform = false
 
 local function mobilefly()
     FLYING = true
@@ -60,6 +61,26 @@ Mov:CreateSlider("Fly Speed", 1, 20, function(v) iyflyspeed = v end)
 Mov:CreateSwitch("Noclip 👻", function(s) noclipActive = s; if s then _G.Nc = RS.Stepped:Connect(function() if LP.Character then for _,v in pairs(LP.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end end end) else if _G.Nc then _G.Nc:Disconnect() end end end)
 Mov:CreateSwitch("Infinite Jump 🦘", function(s) InfJump = s end)
 Mov:CreateSwitch("Walk Fling 🌀", function(s) FLING_ENABLED = s; task.spawn(function() while FLING_ENABLED do RS.Heartbeat:Wait(); if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then local r = LP.Character.HumanoidRootPart; local v = r.Velocity; r.Velocity = v * 10000 + Vector3.new(0,10000,0); RS.RenderStepped:Wait(); r.Velocity = v end end end) end)
+Mov:CreateSwitch("Plataforma Rainbow 🌈", function(s)
+    RainbowPlatform = s
+    if s then
+        local plat = Instance.new("Part", workspace)
+        plat.Size = Vector3.new(5, 1, 5)
+        plat.Anchored = true
+        plat.CanCollide = true
+        plat.Name = "LuisPlatform"
+        task.spawn(function()
+            while RainbowPlatform do
+                RS.RenderStepped:Wait()
+                if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+                    plat.CFrame = LP.Character.HumanoidRootPart.CFrame * CFrame.new(0, -3.5, 0)
+                    plat.Color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+                end
+            end
+            plat:Destroy()
+        end)
+    end
+end)
 
 if game.PlaceId == 14236123211 then
     local Spec = Window:CreateTab("🎮 EVENTO")
@@ -93,26 +114,19 @@ if game.PlaceId == 83347992878150 or tostring(game.PlaceId) == "83347992878150" 
                 if folder then
                     local tickets = {}
                     for _, v in pairs(folder:GetChildren()) do
-                        if v.Name == "Ticket" then
-                            table.insert(tickets, v)
-                        end
+                        if v.Name == "Ticket" then table.insert(tickets, v) end
                     end
                     if #tickets > 0 and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
                         local target = tickets[math.random(1, #tickets)]
-                        if target:IsA("Model") then
-                            LP.Character.HumanoidRootPart.CFrame = target:GetModelCFrame()
-                        elseif target:IsA("BasePart") then
-                            LP.Character.HumanoidRootPart.CFrame = target.CFrame
-                        end
+                        if target:IsA("Model") then LP.Character.HumanoidRootPart.CFrame = target:GetModelCFrame()
+                        elseif target:IsA("BasePart") then LP.Character.HumanoidRootPart.CFrame = target.CFrame end
                     end
                 end
                 task.wait(2)
             end
         end)
     end)
-    TicketTab:CreateButton("VOLVER AL LOBBY 🏠", function()
-        TeleportService:Teleport(13457104744, LP)
-    end)
+    TicketTab:CreateButton("VOLVER AL LOBBY 🏠", function() TeleportService:Teleport(13457104744, LP) end)
 end
 
 local Vis = Window:CreateTab("👁️ VISUALES")
