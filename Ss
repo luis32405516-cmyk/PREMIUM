@@ -1,29 +1,14 @@
-import time
-from datetime import datetime
+import os  # Para manejar rutas locales
+import pathlib
 
-# --- CONFIGURACIÓN DE IDENTIDAD ---
-# ID de la otra cuenta para el script Abel
-MI_ID_AUTORIZADO = "9096976352" 
+# Tu ID de acceso
+MI_ID_AUTORIZADO = "9096976352"
 
-class MonitorAbel:
-    """Para supervisar todo lo que el script hace con la librería."""
-    @staticmethod
-    def log(accion):
-        hora = datetime.now().strftime("%H:%M:%S")
-        print(f"⚙️ [{hora}] [ID: {MI_ID_AUTORIZADO}] -> {accion}")
+def verificar_entorno_local():
+    # Esto te dirá dónde está trabajando Abel en tu PC
+    ruta_actual = pathlib.Path(__file__).parent.absolute()
+    print(f"🏠 [ENTORNO LOCAL] Ejecutando desde: {ruta_actual}")
+    print(f"🔑 [USUARIO] ID: {MI_ID_AUTORIZADO} activo.")
 
-def ejecutar_proceso():
-    # El monitor nos dirá paso a paso qué ocurre
-    MonitorAbel.log("Iniciando conexión con el ID proporcionado...")
-    
-    # Simulación de lectura de la librería
-    MonitorAbel.log("Accediendo a la librería personalizada...")
-    time.sleep(1)
-    
-    MonitorAbel.log("Ejecutando funciones del script Abel...")
-    # Lógica del script aquí
-    
-    MonitorAbel.log("Proceso finalizado con éxito.")
-
-if __name__ == "__main__":
-    ejecutar_proceso()
+# Llamamos a la función
+verificar_entorno_local()
