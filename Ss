@@ -1,0 +1,29 @@
+import time
+from datetime import datetime
+
+# --- CONFIGURACIÓN DE IDENTIDAD ---
+# ID de la otra cuenta para el script Abel
+MI_ID_AUTORIZADO = "9096976352" 
+
+class MonitorAbel:
+    """Para supervisar todo lo que el script hace con la librería."""
+    @staticmethod
+    def log(accion):
+        hora = datetime.now().strftime("%H:%M:%S")
+        print(f"⚙️ [{hora}] [ID: {MI_ID_AUTORIZADO}] -> {accion}")
+
+def ejecutar_proceso():
+    # El monitor nos dirá paso a paso qué ocurre
+    MonitorAbel.log("Iniciando conexión con el ID proporcionado...")
+    
+    # Simulación de lectura de la librería
+    MonitorAbel.log("Accediendo a la librería personalizada...")
+    time.sleep(1)
+    
+    MonitorAbel.log("Ejecutando funciones del script Abel...")
+    # Lógica del script aquí
+    
+    MonitorAbel.log("Proceso finalizado con éxito.")
+
+if __name__ == "__main__":
+    ejecutar_proceso()
