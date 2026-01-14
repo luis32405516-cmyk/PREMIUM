@@ -56,15 +56,14 @@ local function mobilefly()
 end
 
 local Mov = Window:CreateTab("⚡ MOVIMIENTO")
-Mov:CreateSlider("Velocidad", 16, 500, function(v) WalkSpeedValue = v; if LP.Character then LP.Character.Humanoid.WalkSpeed = v end end)
+Mov:CreateSlider("SPEED ⚡", 16, 500, function(v) WalkSpeedValue = v; if LP.Character then LP.Character.Humanoid.WalkSpeed = v end end)
 Mov:CreateSwitch("Fly Mobile (IY)", function(s) if s then mobilefly() else FLYING = false end end)
 Mov:CreateSlider("Fly Speed", 1, 20, function(v) iyflyspeed = v end)
 Mov:CreateSwitch("Noclip 👻", function(s) noclipActive = s; if s then _G.Nc = RS.Stepped:Connect(function() if LP.Character then for _,v in pairs(LP.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end end end) else if _G.Nc then _G.Nc:Disconnect() end end end)
 Mov:CreateSwitch("Infinite Jump 🦘", function(s) InfJump = s end)
 Mov:CreateSwitch("Walk Fling 🌀", function(s) FLING_ENABLED = s; task.spawn(function() while FLING_ENABLED do RS.Heartbeat:Wait(); if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then local r = LP.Character.HumanoidRootPart; local v = r.Velocity; r.Velocity = v * 10000 + Vector3.new(0,10000,0); RS.RenderStepped:Wait(); r.Velocity = v end end end) end)
 
-local TP_STATUS = "GUARDAR UBC 📍"
-Mov:CreateButton(TP_STATUS, function()
+Mov:CreateButton("GUARDAR / TELEPORT 📍", function()
     local char = LP.Character
     if char and char:FindFirstChild("HumanoidRootPart") then
         if not savedPos then
@@ -150,7 +149,7 @@ local Vis = Window:CreateTab("👁️ VISUALES")
 Vis:CreateSwitch("ESP Maestro 🌈", function(s) _G.ESP = s; task.spawn(function() while _G.ESP do local color = (ESP_Color == 0) and Color3.fromHSV((tick()*0.5)%1,1,1) or Color3.fromHSV(ESP_Color/100,1,1); for _, p in pairs(Players:GetPlayers()) do if p ~= LP and p.Character then local hl = p.Character:FindFirstChild("LuisESP") or Instance.new("Highlight", p.Character); hl.Name = "LuisESP"; hl.FillColor = color end end; task.wait() end; for _, p in pairs(Players:GetPlayers()) do if p.Character and p.Character:FindFirstChild("LuisESP") then p.Character.LuisESP:Destroy() end end end) end)
 Vis:CreateSlider("Color ESP (0=Rainbow)", 0, 100, function(v) ESP_Color = v end)
 Vis:CreateSwitch("X-Ray (Paredes) 💎", function(s) XRAY_ENABLED = s; for _,v in pairs(workspace:GetDescendants()) do if v:IsA("BasePart") and not v.Parent:FindFirstChild("Humanoid") then v.Transparency = s and 0.5 or 0 end end end)
-Vis:CreateSlider("Hora", 0, 24, function(v) Lighting.ClockTime = v end)
+Vis:CreateSlider("Hora", 0, 24, function(v) if v ~= 0 then Lighting.ClockTime = v end end)
 
 local Ser = Window:CreateTab("🌐 SERVER")
 Ser:CreateButton("REJOIN 🔄", function() TeleportService:Teleport(game.PlaceId, LP) end)
