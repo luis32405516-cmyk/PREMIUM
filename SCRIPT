@@ -22,6 +22,8 @@ local autoWin = false
 local autoTickets = false
 local RainbowPlatform = false
 local savedPos = nil
+local GhostActive = false
+local GhostPart = nil
 
 local function mobilefly()
     FLYING = true
@@ -62,6 +64,29 @@ Mov:CreateSlider("Fly Speed", 1, 20, function(v) iyflyspeed = v end)
 Mov:CreateSwitch("Noclip 👻", function(s) noclipActive = s; if s then _G.Nc = RS.Stepped:Connect(function() if LP.Character then for _,v in pairs(LP.Character:GetDescendants()) do if v:IsA("BasePart") then v.CanCollide = false end end end end) else if _G.Nc then _G.Nc:Disconnect() end end end)
 Mov:CreateSwitch("Infinite Jump 🦘", function(s) InfJump = s end)
 Mov:CreateSwitch("Walk Fling 🌀", function(s) FLING_ENABLED = s; task.spawn(function() while FLING_ENABLED do RS.Heartbeat:Wait(); if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then local r = LP.Character.HumanoidRootPart; local v = r.Velocity; r.Velocity = v * 10000 + Vector3.new(0,10000,0); RS.RenderStepped:Wait(); r.Velocity = v end end end) end)
+
+-- FUNCIÓN INVISIBLE GHOST
+Mov:CreateSwitch("Invisible Ghost 👻", function(s)
+    GhostActive = s
+    local char = LP.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        if GhostActive then
+            char.Archivable = true
+            GhostPart = char:Clone()
+            GhostPart.Parent = workspace
+            for _, v in pairs(GhostPart:GetDescendants()) do
+                if v:IsA("BasePart") then v.Transparency = 0.5; v.CanCollide = false end
+                if v:IsA("LocalScript") or v:IsA("Script") then v:Destroy() end
+            end
+            char.HumanoidRootPart.Anchored = true
+            Library:Notify("GHOST", "Modo Invisible Activado")
+        else
+            char.HumanoidRootPart.Anchored = false
+            if GhostPart then GhostPart:Destroy(); GhostPart = nil end
+            Library:Notify("GHOST", "Modo Invisible Desactivado")
+        end
+    end
+end)
 
 Mov:CreateButton("GUARDAR / TELEPORT 📍", function()
     local char = LP.Character
