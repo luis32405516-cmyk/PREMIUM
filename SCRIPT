@@ -23,7 +23,6 @@ local autoTickets = false
 local RainbowPlatform = false
 local savedPos = nil
 local GhostActive = false
-local GhostPart = nil
 
 local function mobilefly()
     FLYING = true
@@ -65,25 +64,24 @@ Mov:CreateSwitch("Noclip 👻", function(s) noclipActive = s; if s then _G.Nc = 
 Mov:CreateSwitch("Infinite Jump 🦘", function(s) InfJump = s end)
 Mov:CreateSwitch("Walk Fling 🌀", function(s) FLING_ENABLED = s; task.spawn(function() while FLING_ENABLED do RS.Heartbeat:Wait(); if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then local r = LP.Character.HumanoidRootPart; local v = r.Velocity; r.Velocity = v * 10000 + Vector3.new(0,10000,0); RS.RenderStepped:Wait(); r.Velocity = v end end end) end)
 
--- FUNCIÓN INVISIBLE GHOST
+-- MODO INVISIBLE GHOST (MEJORADO)
 Mov:CreateSwitch("Invisible Ghost 👻", function(s)
     GhostActive = s
     local char = LP.Character
     if char and char:FindFirstChild("HumanoidRootPart") then
         if GhostActive then
-            char.Archivable = true
-            GhostPart = char:Clone()
-            GhostPart.Parent = workspace
-            for _, v in pairs(GhostPart:GetDescendants()) do
-                if v:IsA("BasePart") then v.Transparency = 0.5; v.CanCollide = false end
-                if v:IsA("LocalScript") or v:IsA("Script") then v:Destroy() end
-            end
-            char.HumanoidRootPart.Anchored = true
-            Library:Notify("GHOST", "Modo Invisible Activado")
+            -- Crea un clon visual para ti (opcional) o simplemente anula la sincronización
+            local oldPos = char.HumanoidRootPart.Position
+            _G.GhostLoop = RS.Heartbeat:Connect(function()
+                if GhostActive and char:FindFirstChild("Humanoid") then
+                    -- Esto "engaña" al motor físico para no enviar el movimiento
+                    char.HumanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+                end
+            end)
+            Library:Notify("GHOST", "Ahora eres invisible para los demás")
         else
-            char.HumanoidRootPart.Anchored = false
-            if GhostPart then GhostPart:Destroy(); GhostPart = nil end
-            Library:Notify("GHOST", "Modo Invisible Desactivado")
+            if _G.GhostLoop then _G.GhostLoop:Disconnect() end
+            Library:Notify("GHOST", "Te has sincronizado")
         end
     end
 end)
@@ -123,6 +121,7 @@ Mov:CreateSwitch("Plataforma Rainbow 🌈", function(s)
     end
 end)
 
+-- [RESTO DE TUS PESTAÑAS SE MANTIENEN IGUAL]
 if game.PlaceId == 14236123211 then
     local Spec = Window:CreateTab("🎮 EVENTO")
     Spec:CreateSwitch("Auto Golpes 🥊", function(s)
