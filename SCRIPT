@@ -21,7 +21,7 @@ local autoClicker = false
 local autoWin = false
 local autoTickets = false
 local RainbowPlatform = false
-local savedPos = nil -- Variable para guardar la ubicación
+local savedPos = nil
 
 local function mobilefly()
     FLYING = true
@@ -63,19 +63,17 @@ Mov:CreateSwitch("Noclip 👻", function(s) noclipActive = s; if s then _G.Nc = 
 Mov:CreateSwitch("Infinite Jump 🦘", function(s) InfJump = s end)
 Mov:CreateSwitch("Walk Fling 🌀", function(s) FLING_ENABLED = s; task.spawn(function() while FLING_ENABLED do RS.Heartbeat:Wait(); if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then local r = LP.Character.HumanoidRootPart; local v = r.Velocity; r.Velocity = v * 10000 + Vector3.new(0,10000,0); RS.RenderStepped:Wait(); r.Velocity = v end end end) end)
 
--- BOTÓN INTELIGENTE DE UBICACIÓN
-local TPBtn = Mov:CreateButton("GUARDAR UBC 📍", function() end)
-TPBtn.MouseButton1Click:Connect(function()
-    if not savedPos then
-        if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
-            savedPos = LP.Character.HumanoidRootPart.CFrame
-            TPBtn.Text = "TELETRANSPORTAR 🚀"
-        end
-    else
-        if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
-            LP.Character.HumanoidRootPart.CFrame = savedPos
+local TP_STATUS = "GUARDAR UBC 📍"
+Mov:CreateButton(TP_STATUS, function()
+    local char = LP.Character
+    if char and char:FindFirstChild("HumanoidRootPart") then
+        if not savedPos then
+            savedPos = char.HumanoidRootPart.CFrame
+            Library:Notify("SISTEMA", "Ubicación Guardada ✅")
+        else
+            char.HumanoidRootPart.CFrame = savedPos
             savedPos = nil
-            TPBtn.Text = "GUARDAR UBC 📍"
+            Library:Notify("SISTEMA", "Teletransportado con éxito 🚀")
         end
     end
 end)
