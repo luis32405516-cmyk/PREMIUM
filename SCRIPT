@@ -30,6 +30,7 @@ local autoRebirth = false
 local autoSuperRebirth = false
 local autoStars = false
 local autoClaimRewards = false
+local autoDeletePets = false
 
 local function mobilefly()
     FLYING = true
@@ -137,6 +138,28 @@ if game.PlaceId == 11708967881 then
             while autoOpenEggs do
                 local args = {[1] = tostring(eggNumber), [2] = true}
                 pcall(function() game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Egg"):WaitForChild("Server"):WaitForChild("Purchase"):InvokeServer(unpack(args)) end)
+                task.wait(1)
+            end
+        end)
+    end)
+    EggTab:CreateSwitch("AUTO DELETE PETS (SAFE) 🗑️", function(s)
+        autoDeletePets = s
+        task.spawn(function()
+            while autoDeletePets do
+                pcall(function()
+                    local myPetsFolder = workspace.PlayerData:FindFirstChild(tostring(LP.UserId)) and workspace.PlayerData[tostring(LP.UserId)]:FindFirstChild("Pets")
+                    if myPetsFolder then
+                        for _, pet in pairs(myPetsFolder:GetChildren()) do
+                            if not autoDeletePets then break end
+                            local isLocked = pet:FindFirstChild("Locked") and pet.Locked.Value == true
+                            local isEquipped = pet:FindFirstChild("Equipped") and pet.Equipped.Value == true
+                            if not isLocked and not isEquipped then
+                                game:GetService("ReplicatedStorage").Remote.Pet.Server.Delete:FireServer({{pet.Name}})
+                                task.wait(0.2)
+                            end
+                        end
+                    end
+                end)
                 task.wait(1)
             end
         end)
