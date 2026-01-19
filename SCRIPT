@@ -142,27 +142,23 @@ if game.PlaceId == 11708967881 then
             end
         end)
     end)
-    EggTab:CreateSwitch("ELIMINADO MASIVO (UI LIST) 🗑️", function(s)
+    EggTab:CreateSwitch("BORRADO MASIVO AUTO 🥚🗑️", function(s)
         massDeletePets = s
         task.spawn(function()
             while massDeletePets do
                 pcall(function()
                     local petList = LP.PlayerGui.Main.Center.Pets.PetInventory.PetList
-                    local toDelete = {}
-                    for _, petFrame in pairs(petList:GetChildren()) do
-                        if petFrame:IsA("GuiObject") and petFrame.Name ~= "Template" then
-                            local locked = petFrame:FindFirstChild("Lock") and petFrame.Lock.Visible == true
-                            local equipped = petFrame:FindFirstChild("Equipped") and petFrame.Equipped.Visible == true
-                            if not locked and not equipped then
-                                table.insert(toDelete, petFrame.Name)
-                            end
+                    local ids = {}
+                    for _, item in pairs(petList:GetChildren()) do
+                        if item:IsA("GuiObject") and item.Name ~= "Template" and item.Name ~= "UIListLayout" then
+                            table.insert(ids, item.Name)
                         end
                     end
-                    if #toDelete > 0 then
-                        game:GetService("ReplicatedStorage").Remote.Pet.Server.Delete:FireServer({toDelete})
+                    if #ids > 0 then
+                        game:GetService("ReplicatedStorage").Remote.Pet.Server.Delete:FireServer({ids})
                     end
                 end)
-                task.wait(2)
+                task.wait(3)
             end
         end)
     end)
