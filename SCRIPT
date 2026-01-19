@@ -142,6 +142,21 @@ if game.PlaceId == 11708967881 then
             end
         end)
     end)
+
+    local ThrowTab = Window:CreateTab("🚀 LANZAMIENTO")
+    ThrowTab:CreateButton("LANZAR", function()
+        pcall(function()
+            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Throw"):WaitForChild("Server"):WaitForChild("Request"):FireServer()
+        end)
+    end)
+    
+    ThrowTab:CreateButton("DETENER", function()
+        pcall(function()
+            local remotePath = game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Throw"):WaitForChild("Server")
+            remotePath:WaitForChild("Landed"):InvokeServer(true)
+            remotePath:WaitForChild("Request"):FireServer()
+        end)
+    end)
 end
 
 if game.PlaceId == 83347992878150 or tostring(game.PlaceId) == "83347992878150" then
