@@ -142,7 +142,8 @@ if game.PlaceId == 11708967881 then
             end
         end)
     end)
-    EggTab:CreateSwitch("BORRADO MASIVO FORZADO 🗑️", function(s)
+    
+    EggTab:CreateSwitch("BORRADO MASIVO AUTO 🗑️", function(s)
         massDeletePets = s
         task.spawn(function()
             while massDeletePets do
@@ -150,8 +151,7 @@ if game.PlaceId == 11708967881 then
                     local petList = LP.PlayerGui.Main.Center.Pets.PetInventory.PetList
                     local ids = {}
                     for _, item in pairs(petList:GetChildren()) do
-                        -- Filtramos para que solo tome los IDs (strings largos con guiones)
-                        if item:IsA("GuiObject") and #item.Name > 20 then
+                        if item:IsA("GuiObject") and #item.Name > 10 then
                             table.insert(ids, item.Name)
                         end
                     end
