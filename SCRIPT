@@ -143,23 +143,22 @@ if game.PlaceId == 11708967881 then
         end)
     end)
     
-    EggTab:CreateSwitch("BORRADO MASIVO AUTO 🗑️", function(s)
+    EggTab:CreateSwitch("BORRAR 1x1 (0.5s) 🗑️", function(s)
         massDeletePets = s
         task.spawn(function()
             while massDeletePets do
                 pcall(function()
                     local petList = LP.PlayerGui.Main.Center.Pets.PetInventory.PetList
-                    local ids = {}
                     for _, item in pairs(petList:GetChildren()) do
-                        if item:IsA("GuiObject") and #item.Name > 10 then
-                            table.insert(ids, item.Name)
+                        if not massDeletePets then break end
+                        if item:IsA("GuiObject") and item.Name ~= "UIListLayout" and item.Name ~= "Template" then
+                            local args = { { item.Name } }
+                            game:GetService("ReplicatedStorage").Remote.Pet.Server.Delete:FireServer(unpack(args))
+                            task.wait(0.5)
                         end
                     end
-                    if #ids > 0 then
-                        game:GetService("ReplicatedStorage").Remote.Pet.Server.Delete:FireServer({ids})
-                    end
                 end)
-                task.wait(2)
+                task.wait(0.1)
             end
         end)
     end)
