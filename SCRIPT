@@ -26,6 +26,10 @@ local savedPos = nil
 local networkPaused = nil
 local eggNumber = "1"
 local autoOpenEggs = false
+local autoRebirth = false
+local autoSuperRebirth = false
+local autoStars = false
+local autoClaimRewards = false
 
 local function mobilefly()
     FLYING = true
@@ -131,13 +135,8 @@ if game.PlaceId == 11708967881 then
         autoOpenEggs = s
         task.spawn(function()
             while autoOpenEggs do
-                local args = {
-                    [1] = tostring(eggNumber),
-                    [2] = true
-                }
-                pcall(function()
-                    game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Egg"):WaitForChild("Server"):WaitForChild("Purchase"):InvokeServer(unpack(args))
-                end)
+                local args = {[1] = tostring(eggNumber), [2] = true}
+                pcall(function() game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Egg"):WaitForChild("Server"):WaitForChild("Purchase"):InvokeServer(unpack(args)) end)
                 task.wait(1)
             end
         end)
@@ -145,16 +144,61 @@ if game.PlaceId == 11708967881 then
 
     local ThrowTab = Window:CreateTab("🚀 LANZAMIENTO")
     ThrowTab:CreateButton("LANZAR", function()
-        pcall(function()
-            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Throw"):WaitForChild("Server"):WaitForChild("Request"):FireServer()
-        end)
+        pcall(function() game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Throw"):WaitForChild("Server"):WaitForChild("Request"):FireServer() end)
     end)
-    
     ThrowTab:CreateButton("DETENER", function()
         pcall(function()
-            local remotePath = game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Throw"):WaitForChild("Server")
-            remotePath:WaitForChild("Landed"):InvokeServer(true)
-            remotePath:WaitForChild("Request"):FireServer()
+            local remote = game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Throw"):WaitForChild("Server")
+            remote:WaitForChild("Landed"):InvokeServer(true)
+            remote:WaitForChild("Request"):FireServer()
+        end)
+    end)
+
+    local FarmTab = Window:CreateTab("🌀 AUTO FARM")
+    FarmTab:CreateSwitch("AUTO REBIRTH", function(s)
+        autoRebirth = s
+        task.spawn(function()
+            while autoRebirth do
+                pcall(function() game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Player"):WaitForChild("Server"):WaitForChild("AttemptRebirth"):InvokeServer() end)
+                task.wait(1)
+            end
+        end)
+    end)
+    FarmTab:CreateSwitch("AUTO SUPER REBIRTH", function(s)
+        autoSuperRebirth = s
+        task.spawn(function()
+            while autoSuperRebirth do
+                pcall(function() game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Player"):WaitForChild("Server"):WaitForChild("AttemptSuperRebirth"):InvokeServer() end)
+                task.wait(5)
+            end
+        end)
+    end)
+    FarmTab:CreateButton("RESET PTOS SUPER REBIRTH", function()
+        pcall(function() game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Player"):WaitForChild("Server"):WaitForChild("AttemptResetSuperRebirth"):InvokeServer() end)
+    end)
+    FarmTab:CreateSwitch("CLAIN TIME DAY REWARD", function(s)
+        autoClaimRewards = s
+        task.spawn(function()
+            while autoClaimRewards do
+                pcall(function() game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Player"):WaitForChild("Server"):WaitForChild("ClaimTimedReward"):InvokeServer() end)
+                task.wait(10)
+            end
+        end)
+    end)
+    FarmTab:CreateSwitch("AUTO COLLECT STARS ⭐", function(s)
+        autoStars = s
+        task.spawn(function()
+            while autoStars do
+                pcall(function()
+                    if workspace:FindFirstChild("Stars") then
+                        for _, star in pairs(workspace.Stars:GetChildren()) do
+                            if not autoStars then break end
+                            game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Star"):WaitForChild("Server"):WaitForChild("Collect"):FireServer(star.Name)
+                        end
+                    end
+                end)
+                task.wait(1)
+            end
         end)
     end)
 end
