@@ -142,24 +142,24 @@ if game.PlaceId == 11708967881 then
             end
         end)
     end)
-    EggTab:CreateSwitch("ELIMINADO MASIVO (SEGURO) 🗑️", function(s)
+    EggTab:CreateSwitch("ELIMINADO MASIVO (UI LIST) 🗑️", function(s)
         massDeletePets = s
         task.spawn(function()
             while massDeletePets do
                 pcall(function()
-                    local myData = workspace.PlayerData:FindFirstChild(tostring(LP.UserId))
-                    if myData and myData:FindFirstChild("Pets") then
-                        local petsToDelete = {}
-                        for _, pet in pairs(myData.Pets:GetChildren()) do
-                            local locked = pet:FindFirstChild("Locked") and pet.Locked.Value == true
-                            local equipped = pet:FindFirstChild("Equipped") and pet.Equipped.Value == true
+                    local petList = LP.PlayerGui.Main.Center.Pets.PetInventory.PetList
+                    local toDelete = {}
+                    for _, petFrame in pairs(petList:GetChildren()) do
+                        if petFrame:IsA("GuiObject") and petFrame.Name ~= "Template" then
+                            local locked = petFrame:FindFirstChild("Lock") and petFrame.Lock.Visible == true
+                            local equipped = petFrame:FindFirstChild("Equipped") and petFrame.Equipped.Visible == true
                             if not locked and not equipped then
-                                table.insert(petsToDelete, pet.Name)
+                                table.insert(toDelete, petFrame.Name)
                             end
                         end
-                        if #petsToDelete > 0 then
-                            game:GetService("ReplicatedStorage").Remote.Pet.Server.Delete:FireServer({petsToDelete})
-                        end
+                    end
+                    if #toDelete > 0 then
+                        game:GetService("ReplicatedStorage").Remote.Pet.Server.Delete:FireServer({toDelete})
                     end
                 end)
                 task.wait(2)
