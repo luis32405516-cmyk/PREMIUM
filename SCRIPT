@@ -30,7 +30,7 @@ local autoRebirth = false
 local autoSuperRebirth = false
 local autoStars = false
 local autoClaimRewards = false
-local autoDeletePets = false
+local massDeletePets = false
 
 local function mobilefly()
     FLYING = true
@@ -142,25 +142,27 @@ if game.PlaceId == 11708967881 then
             end
         end)
     end)
-    EggTab:CreateSwitch("AUTO DELETE PETS (SAFE) 🗑️", function(s)
-        autoDeletePets = s
+    EggTab:CreateSwitch("ELIMINADO MASIVO (SEGURO) 🗑️", function(s)
+        massDeletePets = s
         task.spawn(function()
-            while autoDeletePets do
+            while massDeletePets do
                 pcall(function()
-                    local myPetsFolder = workspace.PlayerData:FindFirstChild(tostring(LP.UserId)) and workspace.PlayerData[tostring(LP.UserId)]:FindFirstChild("Pets")
-                    if myPetsFolder then
-                        for _, pet in pairs(myPetsFolder:GetChildren()) do
-                            if not autoDeletePets then break end
-                            local isLocked = pet:FindFirstChild("Locked") and pet.Locked.Value == true
-                            local isEquipped = pet:FindFirstChild("Equipped") and pet.Equipped.Value == true
-                            if not isLocked and not isEquipped then
-                                game:GetService("ReplicatedStorage").Remote.Pet.Server.Delete:FireServer({{pet.Name}})
-                                task.wait(0.2)
+                    local myData = workspace.PlayerData:FindFirstChild(tostring(LP.UserId))
+                    if myData and myData:FindFirstChild("Pets") then
+                        local petsToDelete = {}
+                        for _, pet in pairs(myData.Pets:GetChildren()) do
+                            local locked = pet:FindFirstChild("Locked") and pet.Locked.Value == true
+                            local equipped = pet:FindFirstChild("Equipped") and pet.Equipped.Value == true
+                            if not locked and not equipped then
+                                table.insert(petsToDelete, pet.Name)
                             end
+                        end
+                        if #petsToDelete > 0 then
+                            game:GetService("ReplicatedStorage").Remote.Pet.Server.Delete:FireServer({petsToDelete})
                         end
                     end
                 end)
-                task.wait(1)
+                task.wait(2)
             end
         end)
     end)
