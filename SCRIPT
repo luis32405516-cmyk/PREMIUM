@@ -32,7 +32,6 @@ local autoStars = false
 local autoClaimRewards = false
 local massDeletePets = false
 
--- Variables Juego 16351911381
 local teleporting = false
 local TELEPORT_INTERVAL = 0.1
 local multiTeleporting = false
@@ -149,7 +148,7 @@ Mov:CreateSwitch("Plataforma Inteligente 🌈", function(s)
     end
 end)
 
-if game.PlaceId == 16351911381 or tostring(game.PlaceId) == "16351911381" then
+if game.PlaceId == 113766574853716 or tostring(game.PlaceId) == "113766574853716" then
     local MainTab = Window:CreateTab("🎯 PRINCIPAL")
     MainTab:CreateSwitch("🔎 OBJETOS", function(s)
         teleporting = s
@@ -249,6 +248,7 @@ if game.PlaceId == 11708967881 then
             end
         end)
     end)
+    
     EggTab:CreateSwitch("BORRAR 1x1 (0.5s) 🗑️", function(s)
         massDeletePets = s
         task.spawn(function()
@@ -258,7 +258,8 @@ if game.PlaceId == 11708967881 then
                     for _, item in pairs(petList:GetChildren()) do
                         if not massDeletePets then break end
                         if item:IsA("GuiObject") and item.Name ~= "UIListLayout" and item.Name ~= "Template" then
-                            game:GetService("ReplicatedStorage").Remote.Pet.Server.Delete:FireServer({{item.Name}})
+                            local args = { { item.Name } }
+                            game:GetService("ReplicatedStorage").Remote.Pet.Server.Delete:FireServer(unpack(args))
                             task.wait(0.5)
                         end
                     end
@@ -267,12 +268,16 @@ if game.PlaceId == 11708967881 then
             end
         end)
     end)
+
     local ThrowTab = Window:CreateTab("🚀 LANZAMIENTO")
     ThrowTab:CreateButton("LANZAR", function() pcall(function() game:GetService("ReplicatedStorage").Remote.Throw.Server.Request:FireServer() end) end)
     ThrowTab:CreateButton("DETENER", function() pcall(function() local r = game:GetService("ReplicatedStorage").Remote.Throw.Server; r.Landed:InvokeServer(true); r.Request:FireServer() end) end)
+
     local FarmTab = Window:CreateTab("🌀 AUTO FARM")
     FarmTab:CreateSwitch("AUTO REBIRTH", function(s) autoRebirth = s; task.spawn(function() while autoRebirth do pcall(function() game:GetService("ReplicatedStorage").Remote.Player.Server.AttemptRebirth:InvokeServer() end) task.wait(1) end end) end)
     FarmTab:CreateSwitch("AUTO SUPER REBIRTH", function(s) autoSuperRebirth = s; task.spawn(function() while autoSuperRebirth do pcall(function() game:GetService("ReplicatedStorage").Remote.Player.Server.AttemptSuperRebirth:InvokeServer() end) task.wait(5) end end) end)
+    FarmTab:CreateButton("RESET PTOS SUPER REBIRTH", function() pcall(function() game:GetService("ReplicatedStorage").Remote.Player.Server.AttemptResetSuperRebirth:InvokeServer() end) end)
+    FarmTab:CreateSwitch("CLAIN TIME DAY REWARD", function(s) autoClaimRewards = s; task.spawn(function() while autoClaimRewards do pcall(function() game:GetService("ReplicatedStorage").Remote.Player.Server.ClaimTimedReward:InvokeServer() end) task.wait(10) end end) end)
     FarmTab:CreateSwitch("AUTO COLLECT STARS ⭐", function(s) autoStars = s; task.spawn(function() while autoStars do if workspace:FindFirstChild("Stars") then for _, star in pairs(workspace.Stars:GetChildren()) do if not autoStars then break end game:GetService("ReplicatedStorage").Remote.Star.Server.Collect:FireServer(star.Name) end end task.wait(1) end end) end)
 end
 
@@ -283,8 +288,8 @@ if game.PlaceId == 83347992878150 or tostring(game.PlaceId) == "83347992878150" 
         task.spawn(function()
             while autoTickets do
                 local folder = workspace:FindFirstChild("SpinTicketFolder")
-                if folder and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
-                    for _, v in pairs(folder:GetChildren()) do if v.Name == "Ticket" then LP.Character.HumanoidRootPart.CFrame = v:IsA("Model") and v:GetModelCFrame() or v.CFrame; break end end
+                if folder then
+                    for _, v in pairs(folder:GetChildren()) do if v.Name == "Ticket" and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then LP.Character.HumanoidRootPart.CFrame = v:IsA("Model") and v:GetModelCFrame() or v.CFrame; break end end
                 end
                 task.wait(2)
             end
