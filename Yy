@@ -120,13 +120,14 @@ function Library:CreateWindow()
     Sidebar.Name = "Sidebar"
     Sidebar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     Sidebar.Position = UDim2.new(0, 8, 0, 42)
-    Sidebar.Size = UDim2.new(0, 100, 1, -50)
-    Sidebar.ScrollBarThickness = 4
+    Sidebar.Size = UDim2.new(0, 115, 1, -50)
+    Sidebar.ScrollBarThickness = 5
     Sidebar.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
     Sidebar.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    Sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
+    Sidebar.CanvasSize = UDim2.new(0, 0, 0.1, 0)
     Sidebar.ScrollBarImageTransparency = 0
     Sidebar.VerticalScrollBarInset = Enum.ScrollBarInset.Always
+    Sidebar.Active = true
     Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 10)
     local SidebarList = Instance.new("UIListLayout", Sidebar)
     SidebarList.Padding = UDim.new(0, 4)
@@ -135,8 +136,8 @@ function Library:CreateWindow()
     local Container = Instance.new("Frame", Main)
     Container.Name = "Container"
     Container.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
-    Container.Position = UDim2.new(0, 115, 0, 42)
-    Container.Size = UDim2.new(1, -123, 1, -50)
+    Container.Position = UDim2.new(0, 130, 0, 42)
+    Container.Size = UDim2.new(1, -138, 1, -50)
     Instance.new("UICorner", Container).CornerRadius = UDim.new(0, 10)
 
     local Minimize = Instance.new("TextButton", Header)
@@ -186,18 +187,19 @@ function Library:CreateWindow()
         TabPage.Size = UDim2.new(1, 0, 1, 0)
         TabPage.BackgroundTransparency = 1
         TabPage.Visible = false
-        TabPage.ScrollBarThickness = 10
+        TabPage.ScrollBarThickness = 8
         TabPage.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
         TabPage.AutomaticCanvasSize = Enum.AutomaticSize.Y
-        TabPage.CanvasSize = UDim2.new(0, 0, 0, 0)
+        TabPage.CanvasSize = UDim2.new(0, 0, 0.1, 0)
         TabPage.ScrollBarImageTransparency = 0
         TabPage.VerticalScrollBarInset = Enum.ScrollBarInset.Always
+        TabPage.Active = true
         local TabList = Instance.new("UIListLayout", TabPage)
         TabList.Padding = UDim.new(0, 8)
         TabList.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
         local t = Instance.new("TextButton", Sidebar)
-        t.Size = UDim2.new(0.85, 0, 0, 24)
+        t.Size = UDim2.new(0.88, 0, 0, 24)
         t.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
         t.Text = name
         t.TextColor3 = Color3.new(1, 1, 1)
