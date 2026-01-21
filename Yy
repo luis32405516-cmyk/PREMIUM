@@ -121,12 +121,12 @@ function Library:CreateWindow()
     Sidebar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     Sidebar.Position = UDim2.new(0, 8, 0, 42)
     Sidebar.Size = UDim2.new(0, 100, 1, -50)
-    Sidebar.ScrollBarThickness = 6
+    Sidebar.ScrollBarThickness = 4
     Sidebar.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
     Sidebar.AutomaticCanvasSize = Enum.AutomaticSize.Y
     Sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
     Sidebar.ScrollBarImageTransparency = 0
-    Sidebar.VerticalScrollBarInset = Enum.ScrollBarInset.None
+    Sidebar.VerticalScrollBarInset = Enum.ScrollBarInset.Always
     Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 10)
     local SidebarList = Instance.new("UIListLayout", Sidebar)
     SidebarList.Padding = UDim.new(0, 4)
@@ -197,7 +197,7 @@ function Library:CreateWindow()
         TabList.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
         local t = Instance.new("TextButton", Sidebar)
-        t.Size = UDim2.new(0.9, 0, 0, 24)
+        t.Size = UDim2.new(0.85, 0, 0, 24)
         t.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
         t.Text = name
         t.TextColor3 = Color3.new(1, 1, 1)
