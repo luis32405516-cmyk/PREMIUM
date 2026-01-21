@@ -40,9 +40,8 @@ local stickerIndex = 1
 local autoSticker = false
 local STICKER_INTERVAL = 2.0
 local plat = nil
-local platformYOffset = 3.5
 
-local stickerPaths = {
+local stickerPaths1 = {
     "Stickers.Cheetah.CheckpointNoSticker00A", "ActiveStickers.d6001", "Stickers.Cheetah.CheckpointNoSticker01A",
     "Stickers.Cheetah.CheckpointNoSticker01B", "ActiveStickers.d6002", "Stickers.Cheetah.CheckpointNoSticker02A",
     "ActiveStickers.d6003", "ActiveStickers.d6004", "ActiveStickers.d6005", "ActiveStickers.d6006",
@@ -52,6 +51,15 @@ local stickerPaths = {
     "ActiveStickers.d6011", "ActiveStickers.d6012", "Stickers.Eagle.CheckpointNoSticker12A",
     "Stickers.Eagle.CheckpointNoSticker12B", "ActiveStickers.d6013", "Stickers.Eagle.CheckpointNoSticker13A",
     "Stickers.Eagle.CheckpointNoSticker14A", "ActiveStickers.d6014", "ActiveStickers.d6015"
+}
+
+local stickerPaths2 = {
+    "ActiveStickers.shmf01", "ActiveStickers.shmf02", "ActiveStickers.shmf03",
+    "ActiveStickers.shmf04", "ActiveStickers.shmf05", "ActiveStickers.shmf06",
+    "ActiveStickers.shmf07", "ActiveStickers.shmf08", "ActiveStickers.shmf09",
+    "Checkpoints-NoSticker.CheckpointNoSticker1", "ActiveStickers.shmf10",
+    "ActiveStickers.shmf11", "ActiveStickers.shmf12", "ActiveStickers.shmf13",
+    "ActiveStickers.shmf14"
 }
 
 local function findNode(path)
@@ -64,7 +72,7 @@ end
 
 local function tp(target)
     if target and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
-        local cf = target:IsA("BasePart") and target.CFrame or target:IsA("Model") and target.PrimaryPart and target.PrimaryPart.CFrame
+        local cf = target:IsA("BasePart") and target.CFrame or target:IsA("Model") and target.PrimaryPart and target.PrimaryPart.CFrame or target:IsA("Model") and target:GetModelCFrame()
         if cf then 
             LP.Character.HumanoidRootPart.CFrame = cf 
         end
@@ -139,11 +147,10 @@ Mov:CreateSwitch("Plataforma", function(s)
         end
         task.spawn(function()
             while RainbowPlatform do
-                RS.Heartbeat:Wait()
+                RS.Stepped:Wait()
                 if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
                     local hrp = LP.Character.HumanoidRootPart
-                    -- Se mantiene fija debajo de los pies sin empujar hacia arriba
-                    plat.CFrame = CFrame.new(hrp.Position.X, hrp.Position.Y - 3.8, hrp.Position.Z)
+                    plat.CFrame = CFrame.new(hrp.Position.X, hrp.Position.Y - 4.5, hrp.Position.Z)
                     plat.Color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
                 end
             end
@@ -188,21 +195,19 @@ if game.PlaceId == 113766574853716 or tostring(game.PlaceId) == "113766574853716
     end)
 
     local StickTab = Window:CreateTab("🏁 CHECKPOINTS")
-    -- Botones Manuales Grandes en una sola linea
-    local Row = Instance.new("Frame", Container) -- Nota: La library interna gestiona esto al crear botones seguidos
     StickTab:CreateButton("⏪ ANTERIOR", function()
         stickerIndex = math.max(1, stickerIndex - 1)
-        local node = findNode(stickerPaths[stickerIndex])
+        local node = findNode(stickerPaths1[stickerIndex])
         if node then tp(node:FindFirstChild("Touch")) end
     end)
     StickTab:CreateButton("⏹️ RESET (1)", function()
         stickerIndex = 1
-        local node = findNode(stickerPaths[stickerIndex])
+        local node = findNode(stickerPaths1[stickerIndex])
         if node then tp(node:FindFirstChild("Touch")) end
     end)
     StickTab:CreateButton("⏩ SIGUIENTE", function()
-        stickerIndex = math.min(#stickerPaths, stickerIndex + 1)
-        local node = findNode(stickerPaths[stickerIndex])
+        stickerIndex = math.min(#stickerPaths1, stickerIndex + 1)
+        local node = findNode(stickerPaths1[stickerIndex])
         if node then tp(node:FindFirstChild("Touch")) end
     end)
     
@@ -210,8 +215,57 @@ if game.PlaceId == 113766574853716 or tostring(game.PlaceId) == "113766574853716
         autoSticker = s
         task.spawn(function()
             while autoSticker do
-                stickerIndex = stickerIndex >= #stickerPaths and 1 or stickerIndex + 1
-                local node = findNode(stickerPaths[stickerIndex])
+                stickerIndex = stickerIndex >= #stickerPaths1 and 1 or stickerIndex + 1
+                local node = findNode(stickerPaths1[stickerIndex])
+                if node then tp(node:FindFirstChild("Touch")) end
+                task.wait(2.0)
+            end
+        end)
+    end)
+end
+
+if game.PlaceId == 109144719845087 or tostring(game.PlaceId) == "109144719845087" then
+    local MainTab = Window:CreateTab("🎯 PRINCIPAL")
+    MainTab:CreateSwitch("🔎 OBJETOS", function(s)
+        teleporting = s
+        task.spawn(function()
+            while teleporting do
+                local obj = workspace:FindFirstChild("Pickups") and workspace.Pickups:FindFirstChild("Default")
+                if obj then tp(obj) end
+                task.wait(0.1)
+            end
+        end)
+    end)
+
+    MainTab:CreateButton("GANAR 🏁", function()
+        local win1 = workspace:FindFirstChild("Utility") and workspace.Utility:FindFirstChild("TutorialCompletion")
+        local win2 = workspace:FindFirstChild("Level") and workspace.Level:FindFirstChild("PicnicRoom") and workspace.Level.PicnicRoom:FindFirstChild("50x50Raised")
+        if win1 then tp(win1) elseif win2 then tp(win2) end
+    end)
+
+    local StickTab = Window:CreateTab("🏁 CHECKPOINTS")
+    StickTab:CreateButton("⏪ ANTERIOR", function()
+        stickerIndex = math.max(1, stickerIndex - 1)
+        local node = findNode(stickerPaths2[stickerIndex])
+        if node then tp(node:FindFirstChild("Touch")) end
+    end)
+    StickTab:CreateButton("⏹️ RESET (1)", function()
+        stickerIndex = 1
+        local node = findNode(stickerPaths2[stickerIndex])
+        if node then tp(node:FindFirstChild("Touch")) end
+    end)
+    StickTab:CreateButton("⏩ SIGUIENTE", function()
+        stickerIndex = math.min(#stickerPaths2, stickerIndex + 1)
+        local node = findNode(stickerPaths2[stickerIndex])
+        if node then tp(node:FindFirstChild("Touch")) end
+    end)
+    
+    StickTab:CreateSwitch("AUTO AVANZAR ⏩", function(s)
+        autoSticker = s
+        task.spawn(function()
+            while autoSticker do
+                stickerIndex = stickerIndex >= #stickerPaths2 and 1 or stickerIndex + 1
+                local node = findNode(stickerPaths2[stickerIndex])
                 if node then tp(node:FindFirstChild("Touch")) end
                 task.wait(2.0)
             end
