@@ -1,95 +1,35 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/luis32405516-cmyk/PREMIUM/refs/heads/main/Yy"))()
 local Window = Library:CreateWindow()
 
-local LP = game:GetService("Players").LocalPlayer
-local RS = game:GetService("RunService")
-local CG = game:GetService("CoreGui")
-local VIM = game:GetService("VirtualInputManager")
+local MainTab = Window:CreateTab("🎯 DISPARADOR")
 
-local history = {}
-local isRecording = false
-local isPlaying = false
+local function TriggerUgcData()
+    local success, result = pcall(function()
+        -- Esta es la ruta exacta según tu imagen y descripción
+        local remote = game:GetService("ReplicatedStorage").Packages.Knit.Services.ROTARYUgcLeaderboardService.RF.GetUgcScreenData
+        return remote:InvokeServer()
+    end)
 
-local function toggleCPU(state)
-    if state then
-        local black = Instance.new("ScreenGui", CG)
-        black.Name = "LuisBlack"
-        local f = Instance.new("Frame", black)
-        f.Size = UDim2.new(1,0,1,0)
-        f.BackgroundColor3 = Color3.new(0,0,0)
-        f.Active = true
-        f.ZIndex = 999999
-        setfpscap(5)
+    if success then
+        print("Datos recibidos correctamente")
+        Library:Notify("SISTEMA", "Datos de UGC obtenidos (Ver Consola)")
+        -- Aquí puedes manejar el 'result' si el servidor devuelve tablas de datos
     else
-        local black = CG:FindFirstChild("LuisBlack")
-        if black then black:Destroy() end
-        setfpscap(60)
+        warn("Error al disparar el Remote: ", result)
+        Library:Notify("ERROR", "No se pudo obtener la información")
     end
 end
 
-local MacroTab = Window:CreateTab("🤖 SUPER MACRO")
-
-MacroTab:CreateSwitch("GRABAR TODO 🔴", function(s)
-    isRecording = s
-    if s then
-        history = {}
-        local startTime = tick()
-        task.spawn(function()
-            while isRecording do
-                if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
-                    table.insert(history, {
-                        type = "move",
-                        cf = LP.Character.HumanoidRootPart.CFrame,
-                        t = tick() - startTime
-                    })
-                end
-                task.wait(0.05)
-            end
-        end)
-        
-        -- Graba los clics que haces en la pantalla
-        local clickConnection
-        clickConnection = game:GetService("UserInputService").InputBegan:Connect(function(input, gpe)
-            if isRecording and input.UserInputType == Enum.UserInputType.MouseButton1 then
-                table.insert(history, {
-                    type = "click",
-                    pos = input.Position,
-                    t = tick() - startTime
-                })
-            end
-            if not isRecording then clickConnection:Disconnect() end
-        end)
-    end
+MainTab:CreateButton("OBTENER DATOS UGC 🛰️", function()
+    TriggerUgcData()
 end)
 
-MacroTab:CreateSwitch("REPETIR ACCIONES 🔁", function(s)
-    isPlaying = s
+MainTab:CreateSwitch("AUTO-REFRESCAR UGC 🔁", function(s)
+    _G.AutoUgc = s
     task.spawn(function()
-        while isPlaying do
-            local startPlayTime = tick()
-            for _, data in ipairs(history) do
-                if not isPlaying then break end
-                
-                -- Espera al momento exacto de la grabación para sincronizar
-                repeat RS.Heartbeat:Wait() until (tick() - startPlayTime) >= data.t or not isPlaying
-                
-                if data.type == "move" and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
-                    LP.Character.HumanoidRootPart.CFrame = data.cf
-                elseif data.type == "click" then
-                    VIM:SendMouseButtonEvent(data.pos.X, data.pos.Y, 0, true, game, 1)
-                    VIM:SendMouseButtonEvent(data.pos.X, data.pos.Y, 0, false, game, 1)
-                end
-            end
-            task.wait(1) -- Pequeña pausa antes de reiniciar el bucle
+        while _G.AutoUgc do
+            TriggerUgcData()
+            task.wait(10) -- Espera 10 segundos entre cada petición para evitar baneo
         end
     end)
-end)
-
-MacroTab:CreateSwitch("MODO AHORRO (CPU) 🌑", function(s)
-    toggleCPU(s)
-end)
-
-MacroTab:CreateButton("BORRAR MEMORIA 🗑️", function()
-    history = {}
-    Library:Notify("SISTEMA", "Memoria limpiada")
 end)
