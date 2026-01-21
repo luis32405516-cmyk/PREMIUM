@@ -123,8 +123,10 @@ function Library:CreateWindow()
     Sidebar.Size = UDim2.new(0, 100, 1, -50)
     Sidebar.ScrollBarThickness = 6
     Sidebar.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
-    Sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
     Sidebar.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    Sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
+    Sidebar.ScrollBarImageTransparency = 0
+    Sidebar.VerticalScrollBarInset = Enum.ScrollBarInset.None
     Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 10)
     local SidebarList = Instance.new("UIListLayout", Sidebar)
     SidebarList.Padding = UDim.new(0, 4)
@@ -184,11 +186,12 @@ function Library:CreateWindow()
         TabPage.Size = UDim2.new(1, 0, 1, 0)
         TabPage.BackgroundTransparency = 1
         TabPage.Visible = false
-        TabPage.ScrollBarThickness = 8
+        TabPage.ScrollBarThickness = 10
         TabPage.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
-        TabPage.CanvasSize = UDim2.new(0, 0, 0, 0)
         TabPage.AutomaticCanvasSize = Enum.AutomaticSize.Y
-        TabPage.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
+        TabPage.CanvasSize = UDim2.new(0, 0, 0, 0)
+        TabPage.ScrollBarImageTransparency = 0
+        TabPage.VerticalScrollBarInset = Enum.ScrollBarInset.Always
         local TabList = Instance.new("UIListLayout", TabPage)
         TabList.Padding = UDim.new(0, 8)
         TabList.HorizontalAlignment = Enum.HorizontalAlignment.Center
