@@ -67,7 +67,6 @@ local function tp(target)
         local cf = target:IsA("BasePart") and target.CFrame or target:IsA("Model") and target.PrimaryPart and target.PrimaryPart.CFrame
         if cf then 
             LP.Character.HumanoidRootPart.CFrame = cf 
-            if plat then plat.CFrame = cf * CFrame.new(0, -platformYOffset, 0) end
         end
     end
 end
@@ -126,25 +125,32 @@ Mov:CreateButton("GUARDAR / TELEPORT 📍", function()
     end
 end)
 
-Mov:CreateSwitch("Plataforma Inteligente 🌈", function(s)
+Mov:CreateSwitch("Plataforma", function(s)
     RainbowPlatform = s
     if s then
-        plat = Instance.new("Part", workspace)
-        plat.Size = Vector3.new(6, 1, 6)
-        plat.Anchored = true
-        plat.CanCollide = true
-        plat.Name = "LuisPlatform"
+        if not plat then
+            plat = Instance.new("Part")
+            plat.Size = Vector3.new(10, 1, 10)
+            plat.Anchored = true
+            plat.CanCollide = true
+            plat.Transparency = 0.5
+            plat.Name = "LuisPlatform"
+            plat.Parent = workspace
+        end
         task.spawn(function()
             while RainbowPlatform do
-                RS.RenderStepped:Wait()
+                RS.Heartbeat:Wait()
                 if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
                     local hrp = LP.Character.HumanoidRootPart
-                    plat.CFrame = CFrame.new(hrp.Position.X, hrp.Position.Y - platformYOffset, hrp.Position.Z)
+                    -- Se mantiene fija debajo de los pies sin empujar hacia arriba
+                    plat.CFrame = CFrame.new(hrp.Position.X, hrp.Position.Y - 3.8, hrp.Position.Z)
                     plat.Color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
                 end
             end
             if plat then plat:Destroy(); plat = nil end
         end)
+    else
+        if plat then plat:Destroy(); plat = nil end
     end
 end)
 
@@ -156,11 +162,10 @@ if game.PlaceId == 109144719845087 or tostring(game.PlaceId) == "109144719845087
             while teleporting do
                 local obj = workspace:FindFirstChild("Pickups") and workspace.Pickups:FindFirstChild("Default")
                 if obj then tp(obj) end
-                task.wait(TELEPORT_INTERVAL)
+                task.wait(0.1)
             end
         end)
     end)
-    MainTab:CreateSlider("Velocidad Objetos", 0.1, 5, function(v) TELEPORT_INTERVAL = v end)
 
     MainTab:CreateSwitch("NPC 🔎 OBJETOS", function(s)
         multiTeleporting = s
@@ -171,19 +176,20 @@ if game.PlaceId == 109144719845087 or tostring(game.PlaceId) == "109144719845087
                     if not multiTeleporting then break end
                     local slot = workspace:FindFirstChild("PickupSlots") and workspace.PickupSlots:FindFirstChild(name)
                     if slot and slot:FindFirstChild("Default") then tp(slot.Default) end
-                    task.wait(MULTI_TELEPORT_INTERVAL)
+                    task.wait(2.0)
                 end
             end
         end)
     end)
-    MainTab:CreateSlider("Velocidad NPC", 0.5, 10, function(v) MULTI_TELEPORT_INTERVAL = v end)
 
     MainTab:CreateButton("GANAR 🏁", function()
         local dest = workspace:FindFirstChild("Utility") and workspace.Utility:FindFirstChild("Teleporters") and workspace.Utility.Teleporters:FindFirstChild("Portal_to_Wc")
         if dest then tp(dest.Portal["Canvas Clouds"]:FindFirstChild("Cylinder")) end
     end)
 
-    local StickTab = Window:CreateTab("📜 STICKERS")
+    local StickTab = Window:CreateTab("🏁 CHECKPOINTS")
+    -- Botones Manuales Grandes en una sola linea
+    local Row = Instance.new("Frame", Container) -- Nota: La library interna gestiona esto al crear botones seguidos
     StickTab:CreateButton("⏪ ANTERIOR", function()
         stickerIndex = math.max(1, stickerIndex - 1)
         local node = findNode(stickerPaths[stickerIndex])
@@ -199,6 +205,7 @@ if game.PlaceId == 109144719845087 or tostring(game.PlaceId) == "109144719845087
         local node = findNode(stickerPaths[stickerIndex])
         if node then tp(node:FindFirstChild("Touch")) end
     end)
+    
     StickTab:CreateSwitch("AUTO AVANZAR ⏩", function(s)
         autoSticker = s
         task.spawn(function()
@@ -206,11 +213,10 @@ if game.PlaceId == 109144719845087 or tostring(game.PlaceId) == "109144719845087
                 stickerIndex = stickerIndex >= #stickerPaths and 1 or stickerIndex + 1
                 local node = findNode(stickerPaths[stickerIndex])
                 if node then tp(node:FindFirstChild("Touch")) end
-                task.wait(STICKER_INTERVAL)
+                task.wait(2.0)
             end
         end)
     end)
-    StickTab:CreateSlider("Velocidad Auto", 0.5, 10, function(v) STICKER_INTERVAL = v end)
 end
 
 if game.PlaceId == 14236123211 then
