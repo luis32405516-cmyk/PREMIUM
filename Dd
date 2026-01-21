@@ -62,15 +62,37 @@ local stickerPaths2 = {
     "ActiveStickers.shmf14"
 }
 
-local function findNode(path)
-    local node = workspace
-    for seg in string.gmatch(path, "[^%.]+") do
-        node = node and node:FindFirstChild(seg)
+local function TogglePlatform(state)
+    RainbowPlatform = state
+    if state then
+        if not plat then
+            plat = Instance.new("Part")
+            plat.Size = Vector3.new(10, 1, 10)
+            plat.Anchored = true
+            plat.CanCollide = true
+            plat.Transparency = 0.5
+            plat.Name = "LuisPlatform"
+            plat.Parent = workspace
+            task.spawn(function()
+                while RainbowPlatform do
+                    RS.Stepped:Wait()
+                    if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+                        local hrp = LP.Character.HumanoidRootPart
+                        plat.CFrame = CFrame.new(hrp.Position.X, hrp.Position.Y - 4.5, hrp.Position.Z)
+                        plat.Color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+                    end
+                end
+                if plat then plat:Destroy(); plat = nil end
+            end)
+        end
+    elseif plat then
+        plat:Destroy()
+        plat = nil
     end
-    return node
 end
 
 local function tp(target)
+    if not RainbowPlatform then TogglePlatform(true) end
     if target and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
         local cf = target:IsA("BasePart") and target.CFrame or target:IsA("Model") and target.PrimaryPart and target.PrimaryPart.CFrame or target:IsA("Model") and target:GetModelCFrame()
         if cf then 
@@ -126,40 +148,14 @@ Mov:CreateButton("GUARDAR / TELEPORT 📍", function()
             savedPos = char.HumanoidRootPart.CFrame
             Library:Notify("SISTEMA", "Ubicación Guardada ✅")
         else
-            char.HumanoidRootPart.CFrame = savedPos
+            tp(savedPos)
             savedPos = nil
             Library:Notify("SISTEMA", "Teletransportado con éxito 🚀")
         end
     end
 end)
 
-Mov:CreateSwitch("Plataforma", function(s)
-    RainbowPlatform = s
-    if s then
-        if not plat then
-            plat = Instance.new("Part")
-            plat.Size = Vector3.new(10, 1, 10)
-            plat.Anchored = true
-            plat.CanCollide = true
-            plat.Transparency = 0.5
-            plat.Name = "LuisPlatform"
-            plat.Parent = workspace
-        end
-        task.spawn(function()
-            while RainbowPlatform do
-                RS.Stepped:Wait()
-                if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
-                    local hrp = LP.Character.HumanoidRootPart
-                    plat.CFrame = CFrame.new(hrp.Position.X, hrp.Position.Y - 4.5, hrp.Position.Z)
-                    plat.Color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
-                end
-            end
-            if plat then plat:Destroy(); plat = nil end
-        end)
-    else
-        if plat then plat:Destroy(); plat = nil end
-    end
-end)
+Mov:CreateSwitch("Plataforma", function(s) TogglePlatform(s) end)
 
 if game.PlaceId == 113766574853716 or tostring(game.PlaceId) == "113766574853716" then
     local MainTab = Window:CreateTab("🎯 PRINCIPAL")
