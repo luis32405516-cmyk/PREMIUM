@@ -121,8 +121,9 @@ function Library:CreateWindow()
     Sidebar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
     Sidebar.Position = UDim2.new(0, 8, 0, 42)
     Sidebar.Size = UDim2.new(0, 100, 1, -50)
-    Sidebar.ScrollBarThickness = 2
-    Sidebar.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 80)
+    Sidebar.ScrollBarThickness = 6
+    Sidebar.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
+    Sidebar.CanvasSize = UDim2.new(0, 0, 0, 0)
     Sidebar.AutomaticCanvasSize = Enum.AutomaticSize.Y
     Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 10)
     local SidebarList = Instance.new("UIListLayout", Sidebar)
@@ -183,9 +184,11 @@ function Library:CreateWindow()
         TabPage.Size = UDim2.new(1, 0, 1, 0)
         TabPage.BackgroundTransparency = 1
         TabPage.Visible = false
-        TabPage.ScrollBarThickness = 4
-        TabPage.ScrollBarImageColor3 = Color3.fromRGB(100, 100, 100)
+        TabPage.ScrollBarThickness = 8
+        TabPage.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
+        TabPage.CanvasSize = UDim2.new(0, 0, 0, 0)
         TabPage.AutomaticCanvasSize = Enum.AutomaticSize.Y
+        TabPage.VerticalScrollBarInset = Enum.ScrollBarInset.ScrollBar
         local TabList = Instance.new("UIListLayout", TabPage)
         TabList.Padding = UDim.new(0, 8)
         TabList.HorizontalAlignment = Enum.HorizontalAlignment.Center
@@ -212,7 +215,7 @@ function Library:CreateWindow()
 
         function Elements:CreateButton(text, callback)
             local b = Instance.new("TextButton", TabPage)
-            b.Size = UDim2.new(0.95, 0, 0, 30)
+            b.Size = UDim2.new(0.92, 0, 0, 30)
             b.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
             b.Text = text
             b.TextColor3 = Color3.new(1, 1, 1)
@@ -224,7 +227,7 @@ function Library:CreateWindow()
 
         function Elements:CreateSwitch(text, callback)
             local Frame = Instance.new("Frame", TabPage)
-            Frame.Size = UDim2.new(0.95, 0, 0, 32)
+            Frame.Size = UDim2.new(0.92, 0, 0, 32)
             Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
             Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 8)
             local Label = Instance.new("TextLabel", Frame)
@@ -259,7 +262,7 @@ function Library:CreateWindow()
 
         function Elements:CreateSlider(text, min, max, callback)
             local Frame = Instance.new("Frame", TabPage)
-            Frame.Size = UDim2.new(0.95, 0, 0, 45)
+            Frame.Size = UDim2.new(0.92, 0, 0, 45)
             Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
             Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 8)
             local Label = Instance.new("TextLabel", Frame)
@@ -299,7 +302,7 @@ function Library:CreateWindow()
 
         function Elements:CreateTextBox(text, callback)
             local b = Instance.new("TextBox", TabPage)
-            b.Size = UDim2.new(0.95, 0, 0, 30)
+            b.Size = UDim2.new(0.92, 0, 0, 30)
             b.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
             b.PlaceholderText = text
             b.Text = ""
