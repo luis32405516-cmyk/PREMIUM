@@ -154,7 +154,7 @@ Mov:CreateSwitch("Plataforma", function(s)
     end
 end)
 
-if game.PlaceId == 109144719845087 or tostring(game.PlaceId) == "109144719845087" then
+if game.PlaceId == 113766574853716 or tostring(game.PlaceId) == "113766574853716" then
     local MainTab = Window:CreateTab("🎯 PRINCIPAL")
     MainTab:CreateSwitch("🔎 OBJETOS", function(s)
         teleporting = s
