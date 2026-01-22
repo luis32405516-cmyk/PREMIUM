@@ -1,35 +1,80 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/luis32405516-cmyk/PREMIUM/refs/heads/main/Yy"))()
 local Window = Library:CreateWindow()
 
-local MainTab = Window:CreateTab("🎯 DISPARADOR")
+local LP = game:GetService("Players").LocalPlayer
+local RS = game:GetService("RunService")
+local VIM = game:GetService("VirtualInputManager")
+local UIS = game:GetService("UserInputService")
 
-local function TriggerUgcData()
-    local success, result = pcall(function()
-        -- Esta es la ruta exacta según tu imagen y descripción
-        local remote = game:GetService("ReplicatedStorage").Packages.Knit.Services.ROTARYUgcLeaderboardService.RF.GetUgcScreenData
-        return remote:InvokeServer()
-    end)
+local history = {}
+local isRecording = false
+local isPlaying = false
 
-    if success then
-        print("Datos recibidos correctamente")
-        Library:Notify("SISTEMA", "Datos de UGC obtenidos (Ver Consola)")
-        -- Aquí puedes manejar el 'result' si el servidor devuelve tablas de datos
-    else
-        warn("Error al disparar el Remote: ", result)
-        Library:Notify("ERROR", "No se pudo obtener la información")
+local MacroTab = Window:CreateTab("🤖 MACRO FIX")
+
+MacroTab:CreateSwitch("GRABAR ACCIONES 🔴", function(s)
+    isRecording = s
+    if s then
+        history = {}
+        local startTime = tick()
+        
+        -- Hilo para grabar movimiento
+        task.spawn(function()
+            while isRecording do
+                if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+                    table.insert(history, {
+                        type = "move",
+                        cf = LP.Character.HumanoidRootPart.CFrame,
+                        t = tick() - startTime
+                    })
+                end
+                task.wait(0.05)
+            end
+        end)
+
+        -- Captura de clics reales en pantalla
+        local connection
+        connection = UIS.InputBegan:Connect(function(input, gpe)
+            if isRecording and input.UserInputType == Enum.UserInputType.MouseButton1 then
+                local pos = input.Position
+                table.insert(history, {
+                    type = "click",
+                    x = pos.X,
+                    y = pos.Y,
+                    t = tick() - startTime
+                })
+            end
+            if not isRecording then connection:Disconnect() end
+        end)
     end
-end
-
-MainTab:CreateButton("OBTENER DATOS UGC 🛰️", function()
-    TriggerUgcData()
 end)
 
-MainTab:CreateSwitch("AUTO-REFRESCAR UGC 🔁", function(s)
-    _G.AutoUgc = s
+MacroTab:CreateSwitch("REPETIR TODO 🔁", function(s)
+    isPlaying = s
     task.spawn(function()
-        while _G.AutoUgc do
-            TriggerUgcData()
-            task.wait(10) -- Espera 10 segundos entre cada petición para evitar baneo
+        while isPlaying do
+            local startPlayTime = tick()
+            for _, data in ipairs(history) do
+                if not isPlaying then break end
+                
+                -- Sincronización de tiempo
+                repeat RS.Heartbeat:Wait() until (tick() - startPlayTime) >= data.t or not isPlaying
+                
+                if data.type == "move" and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+                    LP.Character.HumanoidRootPart.CFrame = data.cf
+                elseif data.type == "click" then
+                    -- Simula el clic físico en la pantalla
+                    VIM:SendMouseButtonEvent(data.x, data.y, 0, true, game, 1)
+                    task.wait(0.05)
+                    VIM:SendMouseButtonEvent(data.x, data.y, 0, false, game, 1)
+                end
+            end
+            task.wait(0.5) -- Pausa antes de reiniciar el ciclo
         end
     end)
+end)
+
+MacroTab:CreateButton("LIMPIAR MEMORIA 🗑️", function()
+    history = {}
+    Library:Notify("SISTEMA", "Datos borrados")
 end)
