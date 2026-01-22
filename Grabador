@@ -10,15 +10,15 @@ local history = {}
 local isRecording = false
 local isPlaying = false
 
-local MacroTab = Window:CreateTab("🤖 MACRO FIX")
+local MacroTab = Window:CreateTab("🤖 GRABADOR")
 
-MacroTab:CreateSwitch("GRABAR ACCIONES 🔴", function(s)
+MacroTab:CreateSwitch("GRABAR TODO 🔴", function(s)
     isRecording = s
     if s then
         history = {}
         local startTime = tick()
         
-        -- Hilo para grabar movimiento
+        -- Hilo de alta frecuencia para posición (Captura Teleports)
         task.spawn(function()
             while isRecording do
                 if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
@@ -28,28 +28,27 @@ MacroTab:CreateSwitch("GRABAR ACCIONES 🔴", function(s)
                         t = tick() - startTime
                     })
                 end
-                task.wait(0.05)
+                task.wait(0.03) -- Más rápido para no perder detalle
             end
         end)
 
-        -- Captura de clics reales en pantalla
-        local connection
-        connection = UIS.InputBegan:Connect(function(input, gpe)
-            if isRecording and input.UserInputType == Enum.UserInputType.MouseButton1 then
-                local pos = input.Position
+        -- Captura de Clics (Incluso los que tocan la GUI)
+        local clickCon
+        clickCon = UIS.InputBegan:Connect(function(input)
+            if isRecording and (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then
                 table.insert(history, {
                     type = "click",
-                    x = pos.X,
-                    y = pos.Y,
+                    x = input.Position.X,
+                    y = input.Position.Y,
                     t = tick() - startTime
                 })
             end
-            if not isRecording then connection:Disconnect() end
+            if not isRecording then clickCon:Disconnect() end
         end)
     end
 end)
 
-MacroTab:CreateSwitch("REPETIR TODO 🔁", function(s)
+MacroTab:CreateSwitch("REPETIR GRABACIÓN 🔁", function(s)
     isPlaying = s
     task.spawn(function()
         while isPlaying do
@@ -57,24 +56,25 @@ MacroTab:CreateSwitch("REPETIR TODO 🔁", function(s)
             for _, data in ipairs(history) do
                 if not isPlaying then break end
                 
-                -- Sincronización de tiempo
-                repeat RS.Heartbeat:Wait() until (tick() - startPlayTime) >= data.t or not isPlaying
+                -- Espera al tiempo exacto del frame grabado
+                while (tick() - startPlayTime) < data.t do 
+                    RS.Heartbeat:Wait() 
+                end
                 
                 if data.type == "move" and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
                     LP.Character.HumanoidRootPart.CFrame = data.cf
                 elseif data.type == "click" then
-                    -- Simula el clic físico en la pantalla
                     VIM:SendMouseButtonEvent(data.x, data.y, 0, true, game, 1)
-                    task.wait(0.05)
+                    task.wait(0.01)
                     VIM:SendMouseButtonEvent(data.x, data.y, 0, false, game, 1)
                 end
             end
-            task.wait(0.5) -- Pausa antes de reiniciar el ciclo
+            task.wait(0.1)
         end
     end)
 end)
 
-MacroTab:CreateButton("LIMPIAR MEMORIA 🗑️", function()
+MacroTab:CreateButton("BORRAR MEMORIA 🗑️", function()
     history = {}
-    Library:Notify("SISTEMA", "Datos borrados")
+    Library:Notify("SISTEMA", "Datos eliminados")
 end)
