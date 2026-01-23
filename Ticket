@@ -1,0 +1,72 @@
+local LP = game:GetService("Players").LocalPlayer
+local CG = game:GetService("CoreGui")
+
+-- Crear el contenedor del HUD
+local HUD = Instance.new("ScreenGui", CG)
+HUD.Name = "TicketHUD"
+
+local Frame = Instance.new("Frame", HUD)
+Frame.Size = UDim2.new(0, 150, 0, 250)
+Frame.Position = UDim2.new(0, 10, 0.3, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.BorderSizePixel = 0
+
+local Layout = Instance.new("UIListLayout", Frame)
+Layout.Padding = UDim.new(0, 5)
+Layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+local function CreateBtn(text, color, func)
+    local b = Instance.new("TextButton", Frame)
+    b.Size = UDim2.new(0, 140, 0, 40)
+    b.BackgroundColor3 = color
+    b.Text = text
+    b.TextColor3 = Color3.new(1,1,1)
+    b.Font = Enum.Font.SourceSansBold
+    b.TextSize = 14
+    b.MouseButton1Click:Connect(func)
+end
+
+-- Función para buscar el ticket actual
+local function getTicket()
+    return workspace.SpinTicketFolder:FindFirstChild("Ticket")
+end
+
+-- 1. AZUL: GetData (RemoteFunction)
+CreateBtn("GetData (RF)", Color3.fromRGB(0, 120, 255), function()
+    local t = getTicket()
+    if t then
+        local res = game:GetService("ReplicatedStorage").RemoteMessenger.GetData:InvokeServer(t)
+        print("RF Result: ", res)
+    end
+end)
+
+-- 2. AMARILLO: SendData (RemoteEvent)
+CreateBtn("SendData (RE)", Color3.fromRGB(255, 180, 0), function()
+    local t = getTicket()
+    if t then
+        game:GetService("ReplicatedStorage").RemoteMessenger.SendData:FireServer(t)
+        print("RE Fired")
+    end
+end)
+
+-- 3. AZUL CLARO: bindableGetData (BindableFunction)
+CreateBtn("BindableGet (BF)", Color3.fromRGB(0, 200, 255), function()
+    local t = getTicket()
+    if t then
+        game:GetService("ReplicatedStorage").RemoteMessenger.bindableGetData:Invoke(t)
+        print("BF Invoked")
+    end
+end)
+
+-- 4. NARANJA: bindableSendData (BindableEvent)
+CreateBtn("BindableSend (BE)", Color3.fromRGB(255, 100, 0), function()
+    local t = getTicket()
+    if t then
+        game:GetService("ReplicatedStorage").RemoteMessenger.bindableSendData:Fire(t)
+        print("BE Fired")
+    end
+end)
+
+CreateBtn("CERRAR HUD", Color3.fromRGB(150, 0, 0), function()
+    HUD:Destroy()
+end)
