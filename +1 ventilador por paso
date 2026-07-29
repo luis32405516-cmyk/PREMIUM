@@ -1,0 +1,391 @@
+-- [[ LUIS HUD - SISTEMA AUTOMÁTICO ÉLITE v1.6 ]]
+-- [[ Auto Teleport Coordenadas + DoRebirth ]]
+
+local ScreenGui = Instance.new("ScreenGui")
+local Main = Instance.new("Frame")
+local Header = Instance.new("Frame")
+local Sidebar = Instance.new("ScrollingFrame")
+local Container = Instance.new("ScrollingFrame")
+local Players = game:GetService("Players")
+local LP = Players.LocalPlayer
+local Lighting = game:GetService("Lighting")
+local RunService = game:GetService("RunService")
+local VirtualUser = game:GetService("VirtualUser")
+local GuiService = game:GetService("GuiService")
+
+ScreenGui.Parent = game:GetService("CoreGui")
+ScreenGui.Name = "Luis_System_Elite_v1.6"
+
+local targetCFrame = CFrame.new(-1535.85, 14.14, -13147.33)
+
+local function Notify(text, color)
+    local n = Instance.new("Frame", ScreenGui)
+    n.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    n.Position = UDim2.new(1, 0, 1, -60)
+    n.Size = UDim2.new(0, 180, 0, 35)
+    Instance.new("UICorner", n).CornerRadius = UDim.new(0, 6)
+    local s = Instance.new("UIStroke", n)
+    s.Color = color or Color3.new(0, 1, 1)
+    s.Thickness = 2
+    local l = Instance.new("TextLabel", n)
+    l.Size = UDim2.new(1, 0, 1, 0)
+    l.BackgroundTransparency = 1
+    l.Text = "⚡ " .. text
+    l.TextColor3 = Color3.new(1, 1, 1)
+    l.Font = Enum.Font.GothamBold
+    l.TextSize = 11
+    n:TweenPosition(UDim2.new(1, -190, 1, -60), "Out", "Quart", 0.4)
+    task.wait(2.5)
+    n:TweenPosition(UDim2.new(1, 0, 1, -60), "In", "Quart", 0.4)
+    task.wait(0.5) n:Destroy()
+end
+
+Main.Name = "Main"
+Main.Parent = ScreenGui
+Main.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+Main.Position = UDim2.new(0.5, -170, 0.5, -110)
+Main.Size = UDim2.new(0, 360, 0, 230)
+Main.Active = true
+Main.Draggable = true
+Main.ClipsDescendants = true
+
+local MainStroke = Instance.new("UIStroke", Main)
+MainStroke.Thickness = 2.5
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
+
+Header.Name = "Header"
+Header.Parent = Main
+Header.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Header.Size = UDim2.new(1, 0, 0, 30)
+
+local Title = Instance.new("TextLabel", Header)
+Title.Text = "AUTO SYSTEM ÉLITE"
+Title.Size = UDim2.new(1, 0, 1, 0)
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 12
+Title.TextXAlignment = Enum.TextXAlignment.Center
+
+Sidebar.Name = "Sidebar"
+Sidebar.Parent = Main
+Sidebar.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
+Sidebar.Position = UDim2.new(0, 5, 0, 35)
+Sidebar.Size = UDim2.new(0, 100, 1, -40)
+Sidebar.ScrollBarThickness = 0
+Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 8)
+
+local SidebarList = Instance.new("UIListLayout", Sidebar)
+SidebarList.Padding = UDim.new(0, 3)
+SidebarList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+local AvatarFrame = Instance.new("Frame", Sidebar)
+AvatarFrame.Size = UDim2.new(0, 45, 0, 45)
+AvatarFrame.BackgroundTransparency = 1
+
+local AvatarImg = Instance.new("ImageLabel", AvatarFrame)
+AvatarImg.Size = UDim2.new(1, 0, 1, 0)
+AvatarImg.Position = UDim2.new(0, 0, 0, 2)
+AvatarImg.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+AvatarImg.Image = Players:GetUserThumbnailAsync(LP.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
+Instance.new("UICorner", AvatarImg).CornerRadius = UDim.new(1, 0)
+local AvStroke = Instance.new("UIStroke", AvatarImg)
+AvStroke.Thickness = 1.5
+
+local function AddTab(name)
+    local t = Instance.new("TextButton", Sidebar)
+    t.Size = UDim2.new(0.9, 0, 0, 25)
+    t.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    t.Text = name
+    t.TextColor3 = Color3.new(0.9, 0.9, 0.9)
+    t.Font = Enum.Font.GothamSemibold
+    t.TextSize = 10
+    Instance.new("UICorner", t).CornerRadius = UDim.new(0, 4)
+    return t
+end
+
+local TabAuto = AddTab("⚡ Automático")
+local TabAntiLag = AddTab("🚀 Anti-Lag")
+
+Container.Name = "Container"
+Container.Parent = Main
+Container.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
+Container.Position = UDim2.new(0, 110, 0, 35)
+Container.Size = UDim2.new(1, -115, 1, -40)
+Container.CanvasSize = UDim2.new(0, 0, 0, 0)
+Container.AutomaticCanvasSize = Enum.AutomaticSize.Y
+Container.ScrollBarThickness = 2
+Instance.new("UICorner", Container).CornerRadius = UDim.new(0, 8)
+
+local ContainerList = Instance.new("UIListLayout", Container)
+ContainerList.Padding = UDim.new(0, 4)
+ContainerList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+local function ClearContainer()
+    for _, child in pairs(Container:GetChildren()) do
+        if not child:IsA("UIListLayout") and not child:IsA("UICorner") then
+            child:Destroy()
+        end
+    end
+end
+
+local autoRebirth = false
+local autoTreadmill = false
+local autoTeleport = false
+local antiAfk = false
+local antigameplaypaused = false
+local antiLag = false
+local blackScreen = false
+local savedCFrame = nil
+
+local function CreateToggleButton(text, defaultState, callback)
+    local btn = Instance.new("TextButton", Container)
+    btn.Size = UDim2.new(0.95, 0, 0, 26)
+    btn.BackgroundColor3 = defaultState and Color3.fromRGB(0, 100, 50) or Color3.fromRGB(30, 30, 30)
+    btn.Text = text
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.GothamSemibold
+    btn.TextSize = 10
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 4)
+    
+    local bStroke = Instance.new("UIStroke", btn)
+    bStroke.Thickness = 1
+    bStroke.Transparency = 0.6
+    bStroke.Color = MainStroke.Color
+
+    btn.MouseButton1Click:Connect(function()
+        callback()
+        bStroke.Color = MainStroke.Color
+    end)
+    return btn
+end
+
+local function LoadAutoTab()
+    ClearContainer()
+
+    local rebirthBtn
+    rebirthBtn = CreateToggleButton("🔄 DoRebirth: "..(autoRebirth and "ON" or "OFF"), autoRebirth, function()
+        autoRebirth = not autoRebirth
+        rebirthBtn.Text = "🔄 DoRebirth: "..(autoRebirth and "ON" or "OFF")
+        rebirthBtn.BackgroundColor3 = autoRebirth and Color3.fromRGB(0, 100, 50) or Color3.fromRGB(30, 30, 30)
+        
+        if autoRebirth then
+            Notify("DoRebirth Activado", Color3.fromRGB(0, 255, 0))
+            task.spawn(function()
+                while autoRebirth do
+                    local remote = game:GetService("ReplicatedStorage"):FindFirstChild("DoRebirth")
+                    if remote then
+                        remote:FireServer()
+                    end
+                    task.wait(1.5)
+                end
+            end)
+        else
+            Notify("DoRebirth Desactivado", Color3.fromRGB(255, 0, 0))
+        end
+    end)
+
+    local treadmillBtn
+    treadmillBtn = CreateToggleButton("🏃 TP Coordenadas: "..(autoTreadmill and "ON" or "OFF"), autoTreadmill, function()
+        autoTreadmill = not autoTreadmill
+        treadmillBtn.Text = "🏃 TP Coordenadas: "..(autoTreadmill and "ON" or "OFF")
+        treadmillBtn.BackgroundColor3 = autoTreadmill and Color3.fromRGB(0, 100, 50) or Color3.fromRGB(30, 30, 30)
+        
+        if autoTreadmill then
+            Notify("Auto TP Coordenadas Activado", Color3.fromRGB(0, 255, 0))
+            task.spawn(function()
+                while autoTreadmill do
+                    local char = LP.Character
+                    local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        hrp.CFrame = targetCFrame
+                    end
+                    task.wait(0.5)
+                end
+            end)
+        else
+            Notify("Auto TP Coordenadas Desactivado", Color3.fromRGB(255, 0, 0))
+        end
+    end)
+
+    local tpBtn
+    tpBtn = CreateToggleButton("📍 Auto TP Guardado: "..(autoTeleport and "ON" or "OFF"), autoTeleport, function()
+        autoTeleport = not autoTeleport
+        tpBtn.Text = "📍 Auto TP Guardado: "..(autoTeleport and "ON" or "OFF")
+        tpBtn.BackgroundColor3 = autoTeleport and Color3.fromRGB(0, 100, 50) or Color3.fromRGB(30, 30, 30)
+        
+        if autoTeleport then
+            local char = LP.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                savedCFrame = hrp.CFrame
+                Notify("Ubicación guardada y TP Activo", Color3.fromRGB(0, 255, 255))
+                task.spawn(function()
+                    while autoTeleport do
+                        local currentChar = LP.Character
+                        local currentHrp = currentChar and currentChar:FindFirstChild("HumanoidRootPart")
+                        if currentHrp and savedCFrame then
+                            currentHrp.CFrame = savedCFrame
+                        end
+                        task.wait(0)
+                    end
+                end)
+            else
+                Notify("Error: HumanoidRootPart no encontrado", Color3.fromRGB(255, 0, 0))
+                autoTeleport = false
+                tpBtn.Text = "📍 Auto TP Guardado: OFF"
+                tpBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+            end
+        else
+            Notify("Auto TP Guardado Desactivado", Color3.fromRGB(255, 0, 0))
+            savedCFrame = nil
+        end
+    end)
+end
+
+local function LoadAntiLagTab()
+    ClearContainer()
+
+    local afkBtn
+    afkBtn = CreateToggleButton("🛡️ Anti AFK: "..(antiAfk and "ON" or "OFF"), antiAfk, function()
+        antiAfk = not antiAfk
+        afkBtn.Text = "🛡️ Anti AFK: "..(antiAfk and "ON" or "OFF")
+        afkBtn.BackgroundColor3 = antiAfk and Color3.fromRGB(0, 100, 50) or Color3.fromRGB(30, 30, 30)
+        
+        if antiAfk then
+            Notify("Anti AFK Activado", Color3.fromRGB(0, 255, 100))
+            if not _G.AntiAfkConnected then
+                LP.Idled:Connect(function()
+                    if antiAfk then
+                        VirtualUser:CaptureController()
+                        VirtualUser:ClickButton2(Vector2.new())
+                    end
+                end)
+                _G.AntiAfkConnected = true
+            end
+        else
+            Notify("Anti AFK Desactivado", Color3.fromRGB(255, 0, 0))
+        end
+    end)
+
+    local pausedBtn
+    pausedBtn = CreateToggleButton("🚫 Anti Gameplay Paused: "..(antigameplaypaused and "ON" or "OFF"), antigameplaypaused, function()
+        antigameplaypaused = not antigameplaypaused
+        pausedBtn.Text = "🚫 Anti Gameplay Paused: "..(antigameplaypaused and "ON" or "OFF")
+        pausedBtn.BackgroundColor3 = antigameplaypaused and Color3.fromRGB(0, 100, 50) or Color3.fromRGB(30, 30, 30)
+        
+        if antigameplaypaused then
+            Notify("Anti Gameplay Paused Activado", Color3.fromRGB(0, 255, 150))
+            if not _G.AntiPausedConnected then
+                GuiService.ErrorMessageChanged:Connect(function()
+                    if antigameplaypaused and GuiService:GetErrorMessage() == "Gameplay paused" then
+                        task.wait(0.1)
+                        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, LP)
+                    end
+                end)
+                _G.AntiPausedConnected = true
+            end
+        else
+            Notify("Anti Gameplay Paused Desactivado", Color3.fromRGB(255, 0, 0))
+        end
+    end)
+
+    local lagBtn
+    lagBtn = CreateToggleButton("🚀 Booster Anti Lag: "..(antiLag and "ON" or "OFF"), antiLag, function()
+        antiLag = not antiLag
+        lagBtn.Text = "🚀 Booster Anti Lag: "..(antiLag and "ON" or "OFF")
+        lagBtn.BackgroundColor3 = antiLag and Color3.fromRGB(0, 100, 50) or Color3.fromRGB(30, 30, 30)
+        
+        if antiLag then
+            Notify("Optimizando Gráficos...", Color3.fromRGB(255, 255, 0))
+            task.wait(0.5)
+            settings().Rendering.QualityLevel = 1
+            settings().Rendering.MeshPartDetailLevel = Enum.MeshPartDetailLevel.Low
+            
+            for _, obj in pairs(game:GetDescendants()) do
+                if obj:IsA("Texture") or obj:IsA("Decal") then obj.Transparency = 1
+                elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") then obj.Enabled = false
+                elseif obj:IsA("PostEffect") then obj.Enabled = false
+                end
+            end
+            Lighting.GlobalShadows = false
+            Lighting.FogEnd = 9e9
+            Notify("Anti Lag Activado", Color3.fromRGB(0, 255, 0))
+        else
+            Notify("Restaurando Gráficos...", Color3.fromRGB(255, 255, 255))
+            task.wait(0.5)
+            settings().Rendering.QualityLevel = 0
+            for _, obj in pairs(game:GetDescendants()) do
+                if obj:IsA("Texture") or obj:IsA("Decal") then obj.Transparency = 0
+                elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") then obj.Enabled = true
+                elseif obj:IsA("PostEffect") then obj.Enabled = true
+                end
+            end
+            Lighting.GlobalShadows = true
+            Notify("Gráficos Restaurados", Color3.fromRGB(0, 255, 255))
+        end
+    end)
+
+    local blackBtn
+    blackBtn = CreateToggleButton("⚫ Pantalla Negra (FPS+): "..(blackScreen and "ON" or "OFF"), blackScreen, function()
+        blackScreen = not blackScreen
+        blackBtn.Text = "⚫ Pantalla Negra (FPS+): "..(blackScreen and "ON" or "OFF")
+        blackBtn.BackgroundColor3 = blackScreen and Color3.fromRGB(0, 100, 50) or Color3.fromRGB(30, 30, 30)
+        
+        if blackScreen then
+            RunService:Set3dRenderingEnabled(false)
+            Notify("Renderizado 3D Desactivado", Color3.fromRGB(255, 0, 255))
+        else
+            RunService:Set3dRenderingEnabled(true)
+            Notify("Renderizado 3D Restaurado", Color3.fromRGB(0, 255, 255))
+        end
+    end)
+end
+
+TabAuto.MouseButton1Click:Connect(LoadAutoTab)
+TabAntiLag.MouseButton1Click:Connect(LoadAntiLagTab)
+
+local Close = Instance.new("TextButton", Header)
+Close.Size = UDim2.new(0, 18, 0, 18)
+Close.Position = UDim2.new(1, -22, 0.5, -9)
+Close.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
+Close.Text = "X"
+Instance.new("UICorner", Close).CornerRadius = UDim.new(1, 0)
+Close.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
+
+local Minimize = Instance.new("TextButton", Header)
+Minimize.Size = UDim2.new(0, 18, 0, 18)
+Minimize.Position = UDim2.new(1, -45, 0.5, -9)
+Minimize.BackgroundColor3 = Color3.fromRGB(150, 120, 0)
+Minimize.Text = "-"
+Instance.new("UICorner", Minimize).CornerRadius = UDim.new(1, 0)
+
+local min = false
+Minimize.MouseButton1Click:Connect(function()
+    if not min then
+        Main:TweenSize(UDim2.new(0, 360, 0, 30), "Out", "Quart", 0.3, true)
+        Minimize.Text = "+"
+    else
+        Main:TweenSize(UDim2.new(0, 360, 0, 230), "Out", "Quart", 0.3, true)
+        Minimize.Text = "-"
+    end
+    min = not min
+end)
+
+task.spawn(function()
+    while task.wait(0.01) do
+        local h = (tick() % 5 / 5)
+        local c = Color3.fromHSV(h, 0.8, 1)
+        MainStroke.Color = c
+        Title.TextColor3 = c
+        AvStroke.Color = c
+        for _, obj in pairs(Container:GetChildren()) do
+            if obj:IsA("TextButton") then
+                local stroke = obj:FindFirstChildOfClass("UIStroke")
+                if stroke then stroke.Color = c end
+            end
+        end
+    end
+end)
+
+LoadAutoTab()
+Notify("Script Sincronizado v1.6 ✅", Color3.fromRGB(0, 255, 150))
