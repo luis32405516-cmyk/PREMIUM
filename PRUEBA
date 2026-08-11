@@ -1,4 +1,5 @@
--- [[ LUIS HUD - ENTRENAMIENTO DE VELOCIDAD v2.1 ]]
+-- [[ LUIS HUD - ENTRENAMIENTO DE VELOCIDAD v2.2 ]]
+-- [[ TP a Metas Ordenado por Distancia ]]
 
 local ScreenGui = Instance.new("ScreenGui")
 local Main = Instance.new("Frame")
@@ -13,7 +14,7 @@ local VirtualUser = game:GetService("VirtualUser")
 local GuiService = game:GetService("GuiService")
 
 ScreenGui.Parent = game:GetService("CoreGui")
-ScreenGui.Name = "Luis_System_Speed_v2.1"
+ScreenGui.Name = "Luis_System_Speed_v2.2"
 
 local function Notify(text, color)
     local n = Instance.new("Frame", ScreenGui)
@@ -56,7 +57,7 @@ Header.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 Header.Size = UDim2.new(1, 0, 0, 30)
 
 local Title = Instance.new("TextLabel", Header)
-Title.Text = "VELOCIDAD ÉLITE v2.1"
+Title.Text = "VELOCIDAD ÉLITE v2.2"
 Title.Size = UDim2.new(1, 0, 1, 0)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamBold
@@ -165,7 +166,7 @@ local function LoadAutoTab()
         metaBtn.BackgroundColor3 = autoMeta and Color3.fromRGB(0, 100, 50) or Color3.fromRGB(30, 30, 30)
         
         if autoMeta then
-            Notify("Auto TP Milestones Activado", Color3.fromRGB(0, 255, 0))
+            Notify("Auto TP Progresivo Activado", Color3.fromRGB(0, 255, 0))
             task.spawn(function()
                 while autoMeta do
                     local char = LP.Character
@@ -173,9 +174,9 @@ local function LoadAutoTab()
                     local milestonesFolder = workspace:FindFirstChild("Milestones")
                     
                     if hrp and milestonesFolder then
+                        -- Recolectar todas las metas válidas
+                        local targets = {}
                         for _, milestone in pairs(milestonesFolder:GetChildren()) do
-                            if not autoMeta then break end
-                            
                             local targetPart = nil
                             if milestone:IsA("BasePart") then
                                 targetPart = milestone
@@ -184,8 +185,24 @@ local function LoadAutoTab()
                             end
                             
                             if targetPart and targetPart:IsA("BasePart") then
+                                table.insert(targets, targetPart)
+                            end
+                        end
+                        
+                        -- Ordenar de la más cercana a la más lejana respecto al jugador
+                        table.sort(targets, function(a, b)
+                            return (a.Position - hrp.Position).Magnitude < (b.Position - hrp.Position).Magnitude
+                        end)
+                        
+                        -- Avanzar progresivamente siempre a la meta más cercana hacia adelante
+                        for _, targetPart in ipairs(targets) do
+                            if not autoMeta then break end
+                            
+                            -- Solo teletransportar si la meta está enfrente/adelante (distancia razonable progresiva)
+                            local dist = (targetPart.Position - hrp.Position).Magnitude
+                            if dist > 5 then
                                 hrp.CFrame = targetPart.CFrame + Vector3.new(0, 3, 0)
-                                task.wait(0.2)
+                                task.wait(0.3)
                             end
                         end
                     end
@@ -321,7 +338,7 @@ local function LoadAntiLagTab()
         blackBtn.Text = "⚫ Pantalla Negra (FPS+): "..(blackScreen and "ON" or "OFF")
         blackBtn.BackgroundColor3 = blackScreen and Color3.fromRGB(0, 100, 50) or Color3.fromRGB(30, 30, 30)
         
-        if blackScreen then
+        if blackScreen me
             RunService:Set3dRenderingEnabled(false)
             Notify("Renderizado 3D Desactivado", Color3.fromRGB(255, 0, 255))
         else
@@ -378,4 +395,4 @@ task.spawn(function()
 end)
 
 LoadAutoTab()
-Notify("Milestones Sincronizados ✅", Color3.fromRGB(0, 255, 150))
+Notify("TP Ordenado Progresivo Listo ✅", Color3.fromRGB(0, 255, 150))
