@@ -174,7 +174,6 @@ local function LoadAutoTab()
                     local milestonesFolder = workspace:FindFirstChild("Milestones")
                     
                     if hrp and milestonesFolder then
-                        -- Recolectar todas las metas válidas
                         local targets = {}
                         for _, milestone in pairs(milestonesFolder:GetChildren()) do
                             local targetPart = nil
@@ -189,16 +188,12 @@ local function LoadAutoTab()
                             end
                         end
                         
-                        -- Ordenar de la más cercana a la más lejana respecto al jugador
                         table.sort(targets, function(a, b)
                             return (a.Position - hrp.Position).Magnitude < (b.Position - hrp.Position).Magnitude
                         end)
                         
-                        -- Avanzar progresivamente siempre a la meta más cercana hacia adelante
                         for _, targetPart in ipairs(targets) do
                             if not autoMeta then break end
-                            
-                            -- Solo teletransportar si la meta está enfrente/adelante (distancia razonable progresiva)
                             local dist = (targetPart.Position - hrp.Position).Magnitude
                             if dist > 5 then
                                 hrp.CFrame = targetPart.CFrame + Vector3.new(0, 3, 0)
@@ -338,7 +333,7 @@ local function LoadAntiLagTab()
         blackBtn.Text = "⚫ Pantalla Negra (FPS+): "..(blackScreen and "ON" or "OFF")
         blackBtn.BackgroundColor3 = blackScreen and Color3.fromRGB(0, 100, 50) or Color3.fromRGB(30, 30, 30)
         
-        if blackScreen me
+        if blackScreen then
             RunService:Set3dRenderingEnabled(false)
             Notify("Renderizado 3D Desactivado", Color3.fromRGB(255, 0, 255))
         else
