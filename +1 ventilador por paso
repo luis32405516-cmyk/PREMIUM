@@ -24,7 +24,7 @@ local winPads = {
     { level = "7875", name = "+500Qa Wins", path = {"World 5", "WinPads", "WinPads2", "36A_WinPad_+500QaWins", "Part"} },
     { level = "8100", name = "+1.5Qi Wins", path = {"World 5", "WinPads", "WinPads2", "37A_WinPad_+1.5QiWins", "Part"} },
     { level = "8325", name = "+4Qi Wins", path = {"World 5", "WinPads", "WinPads2", "38A_WinPad_+4QiWins", "Part"} },
-    { level = "8550", name = "+10Qi Wins", path = {"World 5", "WinPads", "WinPads2", "39A_WinPad_+39A_WinPad_+10QiWins", "Part"} },
+    { level = "8550", name = "+10Qi Wins", path = {"World 5", "WinPads", "WinPads2", "39A_WinPad_+10QiWins", "Part"} },
     { level = "8775", name = "+30Qi Wins", path = {"World 5", "WinPads", "WinPads2", "40A_WinPad_+30QiWins", "Part"} },
     { level = "9000", name = "+80Qi Wins", path = {"World 5", "WinPads", "WinPads2", "41A_WinPad_+80QiWins", "Part"} },
     { level = "9225", name = "+200Qi Wins", path = {"World 5", "WinPads", "WinPads2", "42A_WinPad_+200QiWins", "Part"} },
@@ -169,7 +169,7 @@ local antiLag = false
 local antiLagCon = nil
 
 local blackScreen = false
-local BlackOverlay = nil
+local BlackOverlayGui = nil
 
 local function CreateToggleButton(text, defaultState, callback)
     local btn = Instance.new("TextButton", Container)
@@ -452,24 +452,28 @@ local function LoadAntiLagTab()
         if blackScreen then
             RunService:Set3dRenderingEnabled(false)
             
-            if not BlackOverlay then
-                BlackOverlay = Instance.new("Frame", ScreenGui)
-                BlackOverlay.Name = "BlackOverlay"
-                BlackOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-                BlackOverlay.Size = UDim2.new(1, 0, 1, 0)
-                BlackOverlay.Position = UDim2.new(0, 0, 0, 0)
-                BlackOverlay.ZIndex = 0
-                BlackOverlay.Active = false
+            if not BlackOverlayGui then
+                BlackOverlayGui = Instance.new("ScreenGui")
+                BlackOverlayGui.Name = "Luis_BlackOverlay_System"
+                BlackOverlayGui.DisplayOrder = -100
+                BlackOverlayGui.IgnoreGuiInset = true
+                BlackOverlayGui.Parent = game:GetService("CoreGui")
+
+                local blackFrame = Instance.new("Frame", BlackOverlayGui)
+                blackFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+                blackFrame.Size = UDim2.new(1, 0, 1, 0)
+                blackFrame.Position = UDim2.new(0, 0, 0, 0)
+                blackFrame.Active = false
             else
-                BlackOverlay.Visible = true
+                BlackOverlayGui.Enabled = true
             end
 
             Notify("Modo Ahorro de FPS Activado (Negro)", Color3.fromRGB(255, 0, 255))
         else
             RunService:Set3dRenderingEnabled(true)
             
-            if BlackOverlay then
-                BlackOverlay.Visible = false
+            if BlackOverlayGui then
+                BlackOverlayGui.Enabled = false
             end
 
             Notify("Renderizado 3D Restaurado", Color3.fromRGB(0, 255, 255))
@@ -523,6 +527,8 @@ task.spawn(function()
         AvStroke.Color = c
         for _, obj in pairs(Container:GetChildren()) do
             if obj:IsA("TextButton") then
+                local stroke = obj:FindFirstChildOfClass("UIStroke")
+                if stroke me:FindFirstChildOfClass("UIStroke") then end
                 local stroke = obj:FindFirstChildOfClass("UIStroke")
                 if stroke then stroke.Color = c end
             end
