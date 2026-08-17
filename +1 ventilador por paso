@@ -24,7 +24,7 @@ local winPads = {
     { level = "7875", name = "+500Qa Wins", path = {"World 5", "WinPads", "WinPads2", "36A_WinPad_+500QaWins", "Part"} },
     { level = "8100", name = "+1.5Qi Wins", path = {"World 5", "WinPads", "WinPads2", "37A_WinPad_+1.5QiWins", "Part"} },
     { level = "8325", name = "+4Qi Wins", path = {"World 5", "WinPads", "WinPads2", "38A_WinPad_+4QiWins", "Part"} },
-    { level = "8550", name = "+10Qi Wins", path = {"World 5", "WinPads", "WinPads2", "39A_WinPad_+10QiWins", "Part"} },
+    { level = "8550", name = "+10Qi Wins", path = {"World 5", "WinPads", "WinPads2", "39A_WinPad_+39A_WinPad_+10QiWins", "Part"} },
     { level = "8775", name = "+30Qi Wins", path = {"World 5", "WinPads", "WinPads2", "40A_WinPad_+30QiWins", "Part"} },
     { level = "9000", name = "+80Qi Wins", path = {"World 5", "WinPads", "WinPads2", "41A_WinPad_+80QiWins", "Part"} },
     { level = "9225", name = "+200Qi Wins", path = {"World 5", "WinPads", "WinPads2", "42A_WinPad_+200QiWins", "Part"} },
@@ -81,21 +81,21 @@ Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 10)
 Header.Name = "Header"
 Header.Parent = Main
 Header.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-Header.Size = UDim2.new(1, 0, 0, 30)
+Header.Size = UDim2.new(1, 0, 0, 22)
 
 local Title = Instance.new("TextLabel", Header)
 Title.Text = "AUTO SYSTEM ÉLITE v2.0"
 Title.Size = UDim2.new(1, 0, 1, 0)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamBold
-Title.TextSize = 12
+Title.TextSize = 10
 Title.TextXAlignment = Enum.TextXAlignment.Center
 
 Sidebar.Name = "Sidebar"
 Sidebar.Parent = Main
 Sidebar.BackgroundColor3 = Color3.fromRGB(14, 14, 14)
-Sidebar.Position = UDim2.new(0, 5, 0, 35)
-Sidebar.Size = UDim2.new(0, 100, 1, -40)
+Sidebar.Position = UDim2.new(0, 5, 0, 27)
+Sidebar.Size = UDim2.new(0, 100, 1, -32)
 Sidebar.ScrollBarThickness = 0
 Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 8)
 
@@ -130,13 +130,14 @@ end
 
 local TabAuto = AddTab("⚡ Automático")
 local TabWinPads = AddTab("🏆 WinPads")
+TabWinPads.Name = "TabWinPads"
 local TabAntiLag = AddTab("🚀 Anti-Lag")
 
 Container.Name = "Container"
 Container.Parent = Main
 Container.BackgroundColor3 = Color3.fromRGB(16, 16, 16)
-Container.Position = UDim2.new(0, 110, 0, 35)
-Container.Size = UDim2.new(1, -115, 1, -40)
+Container.Position = UDim2.new(0, 110, 0, 27)
+Container.Size = UDim2.new(1, -115, 1, -32)
 Container.CanvasSize = UDim2.new(0, 0, 0, 0)
 Container.AutomaticCanvasSize = Enum.AutomaticSize.Y
 Container.ScrollBarThickness = 2
@@ -157,7 +158,6 @@ end
 local autoRebirth = false
 local autoFarm = false
 local activeWinTpIndex = nil
-local winTpConnections = {}
 
 local antiAfk = false
 local antiAfkCon = nil
@@ -169,6 +169,7 @@ local antiLag = false
 local antiLagCon = nil
 
 local blackScreen = false
+local BlackOverlay = nil
 
 local function CreateToggleButton(text, defaultState, callback)
     local btn = Instance.new("TextButton", Container)
@@ -450,9 +451,27 @@ local function LoadAntiLagTab()
         
         if blackScreen then
             RunService:Set3dRenderingEnabled(false)
-            Notify("Renderizado 3D Desactivado", Color3.fromRGB(255, 0, 255))
+            
+            if not BlackOverlay then
+                BlackOverlay = Instance.new("Frame", ScreenGui)
+                BlackOverlay.Name = "BlackOverlay"
+                BlackOverlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+                BlackOverlay.Size = UDim2.new(1, 0, 1, 0)
+                BlackOverlay.Position = UDim2.new(0, 0, 0, 0)
+                BlackOverlay.ZIndex = 0
+                BlackOverlay.Active = false
+            else
+                BlackOverlay.Visible = true
+            end
+
+            Notify("Modo Ahorro de FPS Activado (Negro)", Color3.fromRGB(255, 0, 255))
         else
             RunService:Set3dRenderingEnabled(true)
+            
+            if BlackOverlay then
+                BlackOverlay.Visible = false
+            end
+
             Notify("Renderizado 3D Restaurado", Color3.fromRGB(0, 255, 255))
         end
     end)
@@ -463,24 +482,30 @@ TabWinPads.MouseButton1Click:Connect(LoadWinPadsTab)
 TabAntiLag.MouseButton1Click:Connect(LoadAntiLagTab)
 
 local Close = Instance.new("TextButton", Header)
-Close.Size = UDim2.new(0, 18, 0, 18)
-Close.Position = UDim2.new(1, -22, 0.5, -9)
+Close.Size = UDim2.new(0, 14, 0, 14)
+Close.Position = UDim2.new(1, -18, 0.5, -7)
 Close.BackgroundColor3 = Color3.fromRGB(150, 0, 0)
 Close.Text = "X"
+Close.TextSize = 9
+Close.Font = Enum.Font.GothamBold
+Close.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", Close).CornerRadius = UDim.new(1, 0)
 Close.MouseButton1Click:Connect(function() ScreenGui:Destroy() end)
 
 local Minimize = Instance.new("TextButton", Header)
-Minimize.Size = UDim2.new(0, 18, 0, 18)
-Minimize.Position = UDim2.new(1, -45, 0.5, -9)
+Minimize.Size = UDim2.new(0, 14, 0, 14)
+Minimize.Position = UDim2.new(1, -36, 0.5, -7)
 Minimize.BackgroundColor3 = Color3.fromRGB(150, 120, 0)
 Minimize.Text = "-"
+Minimize.TextSize = 9
+Minimize.Font = Enum.Font.GothamBold
+Minimize.TextColor3 = Color3.new(1, 1, 1)
 Instance.new("UICorner", Minimize).CornerRadius = UDim.new(1, 0)
 
 local min = false
 Minimize.MouseButton1Click:Connect(function()
     if not min then
-        Main:TweenSize(UDim2.new(0, 360, 0, 30), "Out", "Quart", 0.3, true)
+        Main:TweenSize(UDim2.new(0, 360, 0, 22), "Out", "Quart", 0.3, true)
         Minimize.Text = "+"
     else
         Main:TweenSize(UDim2.new(0, 360, 0, 230), "Out", "Quart", 0.3, true)
