@@ -528,8 +528,6 @@ task.spawn(function()
         for _, obj in pairs(Container:GetChildren()) do
             if obj:IsA("TextButton") then
                 local stroke = obj:FindFirstChildOfClass("UIStroke")
-                if stroke me:FindFirstChildOfClass("UIStroke") then end
-                local stroke = obj:FindFirstChildOfClass("UIStroke")
                 if stroke then stroke.Color = c end
             end
         end
