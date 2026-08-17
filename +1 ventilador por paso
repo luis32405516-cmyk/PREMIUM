@@ -1,5 +1,4 @@
--- [[ LUIS HUD - SISTEMA AUTOMÁTICO ÉLITE v1.6 ]]
--- [[ Auto Teleport Coordenadas + DoRebirth ]]
+-- [[ LUIS HUD - SISTEMA AUTOMÁTICO ÉLITE v2.0 ]]
 
 local ScreenGui = Instance.new("ScreenGui")
 local Main = Instance.new("Frame")
@@ -12,11 +11,37 @@ local Lighting = game:GetService("Lighting")
 local RunService = game:GetService("RunService")
 local VirtualUser = game:GetService("VirtualUser")
 local GuiService = game:GetService("GuiService")
+local Workspace = game:GetService("Workspace")
 
 ScreenGui.Parent = game:GetService("CoreGui")
-ScreenGui.Name = "Luis_System_Elite_v1.6"
+ScreenGui.Name = "Luis_System_Elite_v2.0"
 
-local targetCFrame = CFrame.new(-1535.85, 14.14, -13147.33)
+local farmCFrame = CFrame.new(-1536.39, 14.33, -16262.12)
+
+local winPads = {
+    { level = "7425", name = "+70Qa Wins", path = {"World 5", "WinPads", "WinPads2", "34A_WinPad_+70QaWins", "Part"} },
+    { level = "7650", name = "+200Qa Wins", path = {"World 5", "WinPads", "WinPads2", "35A_WinPad_+200QaWins", "Part"} },
+    { level = "7875", name = "+500Qa Wins", path = {"World 5", "WinPads", "WinPads2", "36A_WinPad_+500QaWins", "Part"} },
+    { level = "8100", name = "+1.5Qi Wins", path = {"World 5", "WinPads", "WinPads2", "37A_WinPad_+1.5QiWins", "Part"} },
+    { level = "8325", name = "+4Qi Wins", path = {"World 5", "WinPads", "WinPads2", "38A_WinPad_+4QiWins", "Part"} },
+    { level = "8550", name = "+10Qi Wins", path = {"World 5", "WinPads", "WinPads2", "39A_WinPad_+10QiWins", "Part"} },
+    { level = "8775", name = "+30Qi Wins", path = {"World 5", "WinPads", "WinPads2", "40A_WinPad_+30QiWins", "Part"} },
+    { level = "9000", name = "+80Qi Wins", path = {"World 5", "WinPads", "WinPads2", "41A_WinPad_+80QiWins", "Part"} },
+    { level = "9225", name = "+200Qi Wins", path = {"World 5", "WinPads", "WinPads2", "42A_WinPad_+200QiWins", "Part"} },
+    { level = "9450", name = "+500Qi Wins", path = {"World 5", "WinPads", "WinPads2", "43A_WinPad_+500QiWins", "Part"} },
+    { level = "9675", name = "+1.2Sx Wins", path = {"World 5", "WinPads", "WinPads2", "44A_WinPad_+1.2SxWins", "Part"} },
+    { level = "9900", name = "+4Sx Wins", path = {"World 5", "WinPads", "WinPads2", "45A_WinPad_+4SxWins", "Part"} },
+    { level = "10125", name = "+10Sx Wins", path = {"World 5", "WinPads", "WinPads2", "46A_WinPad_+10SxWins", "Part"} },
+}
+
+local function GetObjectFromPath(pathTable)
+    local current = Workspace
+    for _, name in ipairs(pathTable) do
+        current = current:FindFirstChild(name)
+        if not current then return nil end
+    end
+    return current
+end
 
 local function Notify(text, color)
     local n = Instance.new("Frame", ScreenGui)
@@ -59,7 +84,7 @@ Header.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 Header.Size = UDim2.new(1, 0, 0, 30)
 
 local Title = Instance.new("TextLabel", Header)
-Title.Text = "AUTO SYSTEM ÉLITE"
+Title.Text = "AUTO SYSTEM ÉLITE v2.0"
 Title.Size = UDim2.new(1, 0, 1, 0)
 Title.BackgroundTransparency = 1
 Title.Font = Enum.Font.GothamBold
@@ -104,6 +129,7 @@ local function AddTab(name)
 end
 
 local TabAuto = AddTab("⚡ Automático")
+local TabWinPads = AddTab("🏆 WinPads")
 local TabAntiLag = AddTab("🚀 Anti-Lag")
 
 Container.Name = "Container"
@@ -129,13 +155,20 @@ local function ClearContainer()
 end
 
 local autoRebirth = false
-local autoTreadmill = false
-local autoTeleport = false
+local autoFarm = false
+local activeWinTpIndex = nil
+local winTpConnections = {}
+
 local antiAfk = false
+local antiAfkCon = nil
+
 local antigameplaypaused = false
+local networkPausedCon = nil
+
 local antiLag = false
+local antiLagCon = nil
+
 local blackScreen = false
-local savedCFrame = nil
 
 local function CreateToggleButton(text, defaultState, callback)
     local btn = Instance.new("TextButton", Container)
@@ -163,13 +196,13 @@ local function LoadAutoTab()
     ClearContainer()
 
     local rebirthBtn
-    rebirthBtn = CreateToggleButton("🔄 DoRebirth: "..(autoRebirth and "ON" or "OFF"), autoRebirth, function()
+    rebirthBtn = CreateToggleButton("🔄 AUTO REBIRT: "..(autoRebirth and "ON" or "OFF"), autoRebirth, function()
         autoRebirth = not autoRebirth
-        rebirthBtn.Text = "🔄 DoRebirth: "..(autoRebirth and "ON" or "OFF")
+        rebirthBtn.Text = "🔄 AUTO REBIRT: "..(autoRebirth and "ON" or "OFF")
         rebirthBtn.BackgroundColor3 = autoRebirth and Color3.fromRGB(0, 100, 50) or Color3.fromRGB(30, 30, 30)
         
         if autoRebirth then
-            Notify("DoRebirth Activado", Color3.fromRGB(0, 255, 0))
+            Notify("AUTO REBIRT Activado", Color3.fromRGB(0, 255, 0))
             task.spawn(function()
                 while autoRebirth do
                     local remote = game:GetService("ReplicatedStorage"):FindFirstChild("DoRebirth")
@@ -180,67 +213,72 @@ local function LoadAutoTab()
                 end
             end)
         else
-            Notify("DoRebirth Desactivado", Color3.fromRGB(255, 0, 0))
+            Notify("AUTO REBIRT Desactivado", Color3.fromRGB(255, 0, 0))
         end
     end)
 
-    local treadmillBtn
-    treadmillBtn = CreateToggleButton("🏃 TP Coordenadas: "..(autoTreadmill and "ON" or "OFF"), autoTreadmill, function()
-        autoTreadmill = not autoTreadmill
-        treadmillBtn.Text = "🏃 TP Coordenadas: "..(autoTreadmill and "ON" or "OFF")
-        treadmillBtn.BackgroundColor3 = autoTreadmill and Color3.fromRGB(0, 100, 50) or Color3.fromRGB(30, 30, 30)
+    local farmBtn
+    farmBtn = CreateToggleButton("🏃 FARMEAR: "..(autoFarm and "ON" or "OFF"), autoFarm, function()
+        autoFarm = not autoFarm
+        farmBtn.Text = "🏃 FARMEAR: "..(autoFarm and "ON" or "OFF")
+        farmBtn.BackgroundColor3 = autoFarm and Color3.fromRGB(0, 100, 50) or Color3.fromRGB(30, 30, 30)
         
-        if autoTreadmill then
-            Notify("Auto TP Coordenadas Activado", Color3.fromRGB(0, 255, 0))
+        if autoFarm then
+            Notify("FARMEAR Activado", Color3.fromRGB(0, 255, 0))
             task.spawn(function()
-                while autoTreadmill do
+                while autoFarm do
                     local char = LP.Character
                     local hrp = char and char:FindFirstChild("HumanoidRootPart")
                     if hrp then
-                        hrp.CFrame = targetCFrame
+                        hrp.CFrame = farmCFrame
                     end
                     task.wait(0.5)
                 end
             end)
         else
-            Notify("Auto TP Coordenadas Desactivado", Color3.fromRGB(255, 0, 0))
-        end
-    end)
-
-    local tpBtn
-    tpBtn = CreateToggleButton("📍 Auto TP Guardado: "..(autoTeleport and "ON" or "OFF"), autoTeleport, function()
-        autoTeleport = not autoTeleport
-        tpBtn.Text = "📍 Auto TP Guardado: "..(autoTeleport and "ON" or "OFF")
-        tpBtn.BackgroundColor3 = autoTeleport and Color3.fromRGB(0, 100, 50) or Color3.fromRGB(30, 30, 30)
-        
-        if autoTeleport then
-            local char = LP.Character
-            local hrp = char and char:FindFirstChild("HumanoidRootPart")
-            if hrp then
-                savedCFrame = hrp.CFrame
-                Notify("Ubicación guardada y TP Activo", Color3.fromRGB(0, 255, 255))
-                task.spawn(function()
-                    while autoTeleport do
-                        local currentChar = LP.Character
-                        local currentHrp = currentChar and currentChar:FindFirstChild("HumanoidRootPart")
-                        if currentHrp and savedCFrame then
-                            currentHrp.CFrame = savedCFrame
-                        end
-                        task.wait(0)
-                    end
-                end)
-            else
-                Notify("Error: HumanoidRootPart no encontrado", Color3.fromRGB(255, 0, 0))
-                autoTeleport = false
-                tpBtn.Text = "📍 Auto TP Guardado: OFF"
-                tpBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-            end
-        else
-            Notify("Auto TP Guardado Desactivado", Color3.fromRGB(255, 0, 0))
-            savedCFrame = nil
+            Notify("FARMEAR Desactivado", Color3.fromRGB(255, 0, 0))
         end
     end)
 end
+
+local function LoadWinPadsTab()
+    ClearContainer()
+
+    for idx, padInfo in ipairs(winPads) do
+        local isState = (activeWinTpIndex == idx)
+        local btnText = "🏆 [" .. padInfo.level .. " Lvl] " .. padInfo.name .. ": " .. (isState and "ON" or "OFF")
+        
+        local winBtn
+        winBtn = CreateToggleButton(btnText, isState, function()
+            if activeWinTpIndex == idx then
+                activeWinTpIndex = nil
+                Notify("TP WinPad Desactivado", Color3.fromRGB(255, 0, 0))
+            else
+                activeWinTpIndex = idx
+                Notify("TP " .. padInfo.name .. " Activado", Color3.fromRGB(0, 255, 255))
+            end
+            
+            LoadWinPadsTab()
+        end)
+    end
+end
+
+task.spawn(function()
+    while true do
+        task.wait(0)
+        if activeWinTpIndex then
+            local padInfo = winPads[activeWinTpIndex]
+            if padInfo then
+                local targetPart = GetObjectFromPath(padInfo.path)
+                local char = LP.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                if hrp and targetPart then
+                    hrp.CFrame = targetPart.CFrame
+                end
+            end
+        end
+    end
+end)
 
 local function LoadAntiLagTab()
     ClearContainer()
@@ -253,16 +291,29 @@ local function LoadAntiLagTab()
         
         if antiAfk then
             Notify("Anti AFK Activado", Color3.fromRGB(0, 255, 100))
-            if not _G.AntiAfkConnected then
-                LP.Idled:Connect(function()
-                    if antiAfk then
-                        VirtualUser:CaptureController()
-                        VirtualUser:ClickButton2(Vector2.new())
-                    end
-                end)
-                _G.AntiAfkConnected = true
+            if getconnections then
+                for _, c in pairs(getconnections(LP.Idled)) do
+                    pcall(function() c:Disable() end)
+                    pcall(function() c:Disconnect() end)
+                end
             end
+
+            if antiAfkCon then
+                antiAfkCon:Disconnect()
+                antiAfkCon = nil
+            end
+
+            antiAfkCon = LP.Idled:Connect(function()
+                if antiAfk then
+                    VirtualUser:CaptureController()
+                    VirtualUser:ClickButton2(Vector2.zero)
+                end
+            end)
         else
+            if antiAfkCon then
+                antiAfkCon:Disconnect()
+                antiAfkCon = nil
+            end
             Notify("Anti AFK Desactivado", Color3.fromRGB(255, 0, 0))
         end
     end)
@@ -275,16 +326,30 @@ local function LoadAntiLagTab()
         
         if antigameplaypaused then
             Notify("Anti Gameplay Paused Activado", Color3.fromRGB(0, 255, 150))
-            if not _G.AntiPausedConnected then
-                GuiService.ErrorMessageChanged:Connect(function()
-                    if antigameplaypaused and GuiService:GetErrorMessage() == "Gameplay paused" then
-                        task.wait(0.1)
-                        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, LP)
+            local robloxGui = GuiService.Parent:FindFirstChild("RobloxGui") or game:GetService("CoreGui"):FindFirstChild("RobloxGui")
+            
+            if robloxGui then
+                local existingPause = robloxGui:FindFirstChild("CoreScripts/NetworkPause")
+                if existingPause then
+                    pcall(function() existingPause:Destroy() end)
+                end
+
+                if networkPausedCon then
+                    networkPausedCon:Disconnect()
+                    networkPausedCon = nil
+                end
+
+                networkPausedCon = robloxGui.ChildAdded:Connect(function(obj)
+                    if antigameplaypaused and obj.Name == "CoreScripts/NetworkPause" then
+                        pcall(function() obj:Destroy() end)
                     end
                 end)
-                _G.AntiPausedConnected = true
             end
         else
+            if networkPausedCon then
+                networkPausedCon:Disconnect()
+                networkPausedCon = nil
+            end
             Notify("Anti Gameplay Paused Desactivado", Color3.fromRGB(255, 0, 0))
         end
     end)
@@ -297,30 +362,82 @@ local function LoadAntiLagTab()
         
         if antiLag then
             Notify("Optimizando Gráficos...", Color3.fromRGB(255, 255, 0))
-            task.wait(0.5)
-            settings().Rendering.QualityLevel = 1
-            settings().Rendering.MeshPartDetailLevel = Enum.MeshPartDetailLevel.Low
             
-            for _, obj in pairs(game:GetDescendants()) do
-                if obj:IsA("Texture") or obj:IsA("Decal") then obj.Transparency = 1
-                elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") then obj.Enabled = false
-                elseif obj:IsA("PostEffect") then obj.Enabled = false
-                end
+            local Terrain = Workspace:FindFirstChildWhichIsA("Terrain")
+            if Terrain then
+                Terrain.WaterWaveSize = 0
+                Terrain.WaterWaveSpeed = 0
+                Terrain.WaterReflectance = 0
+                Terrain.WaterTransparency = 1
             end
+            
             Lighting.GlobalShadows = false
             Lighting.FogEnd = 9e9
-            Notify("Anti Lag Activado", Color3.fromRGB(0, 255, 0))
-        else
-            Notify("Restaurando Gráficos...", Color3.fromRGB(255, 255, 255))
-            task.wait(0.5)
-            settings().Rendering.QualityLevel = 0
-            for _, obj in pairs(game:GetDescendants()) do
-                if obj:IsA("Texture") or obj:IsA("Decal") then obj.Transparency = 0
-                elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail") then obj.Enabled = true
-                elseif obj:IsA("PostEffect") then obj.Enabled = true
+            Lighting.FogStart = 9e9
+            settings().Rendering.QualityLevel = 1
+            
+            for _, v in pairs(game:GetDescendants()) do
+                if v:IsA("BasePart") then
+                    v.CastShadow = false
+                    v.Material = Enum.Material.Plastic
+                    v.Reflectance = 0
+                    v.BackSurface = Enum.SurfaceType.SmoothNoOutlines
+                    v.BottomSurface = Enum.SurfaceType.SmoothNoOutlines
+                    v.FrontSurface = Enum.SurfaceType.SmoothNoOutlines
+                    v.LeftSurface = Enum.SurfaceType.SmoothNoOutlines
+                    v.RightSurface = Enum.SurfaceType.SmoothNoOutlines
+                    v.TopSurface = Enum.SurfaceType.SmoothNoOutlines
+                elseif v:IsA("Decal") or v:IsA("Texture") then
+                    v.Transparency = 1
+                elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+                    v.Enabled = false
                 end
             end
+
+            for _, v in pairs(Lighting:GetDescendants()) do
+                if v:IsA("PostEffect") then
+                    v.Enabled = false
+                end
+            end
+
+            if antiLagCon then
+                antiLagCon:Disconnect()
+                antiLagCon = nil
+            end
+
+            antiLagCon = Workspace.DescendantAdded:Connect(function(child)
+                if antiLag then
+                    task.spawn(function()
+                        if child:IsA("ForceField") or child:IsA("Sparkles") or child:IsA("Smoke") or child:IsA("Fire") or child:IsA("Beam") then
+                            RunService.Heartbeat:Wait()
+                            pcall(function() child:Destroy() end)
+                        elseif child:IsA("BasePart") then
+                            child.CastShadow = false
+                        end
+                    end)
+                end
+            end)
+
+            Notify("Anti Lag Activado", Color3.fromRGB(0, 255, 0))
+        else
+            if antiLagCon then
+                antiLagCon:Disconnect()
+                antiLagCon = nil
+            end
+            
+            settings().Rendering.QualityLevel = 0
             Lighting.GlobalShadows = true
+            
+            for _, v in pairs(game:GetDescendants()) do
+                if v:IsA("Decal") or v:IsA("Texture") then
+                    v.Transparency = 0
+                elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
+                    v.Enabled = true
+                elseif v:IsA("PostEffect") then
+                    v.Enabled = true
+                end
+            end
+
             Notify("Gráficos Restaurados", Color3.fromRGB(0, 255, 255))
         end
     end)
@@ -342,6 +459,7 @@ local function LoadAntiLagTab()
 end
 
 TabAuto.MouseButton1Click:Connect(LoadAutoTab)
+TabWinPads.MouseButton1Click:Connect(LoadWinPadsTab)
 TabAntiLag.MouseButton1Click:Connect(LoadAntiLagTab)
 
 local Close = Instance.new("TextButton", Header)
@@ -388,4 +506,4 @@ task.spawn(function()
 end)
 
 LoadAutoTab()
-Notify("Script Sincronizado v1.6 ✅", Color3.fromRGB(0, 255, 150))
+Notify("Script Sincronizado v2.0 ✅", Color3.fromRGB(0, 255, 150))
