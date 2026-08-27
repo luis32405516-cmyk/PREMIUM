@@ -30,6 +30,39 @@ local function CreateScreenGui()
     return gui
 end
 
+function Library:Notify(text, color)
+    local ScreenGui = CoreGui:FindFirstChild("Luis_Notify_System")
+    if not ScreenGui then
+        ScreenGui = Instance.new("ScreenGui")
+        ScreenGui.Name = "Luis_Notify_System"
+        ScreenGui.Parent = CoreGui
+    end
+
+    local n = Instance.new("Frame", ScreenGui)
+    n.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    n.Position = UDim2.new(1, 0, 1, -60)
+    n.Size = UDim2.new(0, 180, 0, 35)
+    Instance.new("UICorner", n).CornerRadius = UDim.new(0, 6)
+    
+    local s = Instance.new("UIStroke", n)
+    s.Color = color or Color3.fromRGB(0, 255, 255)
+    s.Thickness = 2
+    
+    local l = Instance.new("TextLabel", n)
+    l.Size = UDim2.new(1, 0, 1, 0)
+    l.BackgroundTransparency = 1
+    l.Text = "⚡ " .. tostring(text)
+    l.TextColor3 = Color3.fromRGB(255, 255, 255)
+    l.Font = Enum.Font.GothamBold
+    l.TextSize = 11
+    
+    n:TweenPosition(UDim2.new(1, -190, 1, -60), "Out", "Quart", 0.4)
+    task.wait(2.5)
+    n:TweenPosition(UDim2.new(1, 0, 1, -60), "In", "Quart", 0.4)
+    task.wait(0.5)
+    n:Destroy()
+end
+
 function Library:CreateWindow(config)
     config = config or {}
     local windowTitle = config.Title or "LUISITO"
