@@ -1,11 +1,40 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/luis32405516-cmyk/PREMIUM/refs/heads/main/LIBRARY%20VIP"))()
 
 local Window = Library:CreateWindow({
-    Title = "AURA PINK HUB",
+    Title = "LUISITO",
     ThemeColor = Color3.fromRGB(168, 85, 247)
 })
 
-local Mundo1 = Window:CreateTab("Mundo 1")
-Mundo1:AddButton("Test Boton", function()
-    print("Funciona perfectamente!")
+-- Botones de Mapas (Arriba)
+Window:CreateMapButton("Mapa 1", function()
+    print("Mapa 1 seleccionado")
+end)
+
+Window:CreateMapButton("Mapa 2", function()
+    print("Mapa 2 seleccionado")
+end)
+
+Window:CreateMapButton("Mapa 3", function()
+    print("Mapa 3 seleccionado")
+end)
+
+-- Pestañas (Izquierda) y Opciones (Derecha)
+local MainTab = Window:CreateTab("Principal")
+
+MainTab:AddToggle("Auto Farm", false, function(state)
+    print("Auto Farm:", state)
+end)
+
+MainTab:AddButton("Teleport a Zona", function()
+    print("Teleport ejecutado")
+end)
+
+MainTab:AddDropdown("Seleccionar Arma", {"Espada", "Pistola", "Magia"}, function(selected)
+    print("Arma seleccionada:", selected)
+end)
+
+local MiscTab = Window:CreateTab("Ajustes")
+
+MiscTab:AddToggle("Velocidad +50", false, function(state)
+    print("Velocidad:", state)
 end)
