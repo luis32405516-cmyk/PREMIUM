@@ -7,7 +7,7 @@ local CoreGui = game:GetService("CoreGui")
 
 local function CreateScreenGui()
     local gui = Instance.new("ScreenGui")
-    gui.Name = "CustomHUD_Library"
+    gui.Name = "CustomHUD_LUISITO"
     gui.ResetOnSpawn = false
     
     local success, res = pcall(function()
@@ -32,7 +32,7 @@ end
 
 function Library:CreateWindow(config)
     config = config or {}
-    local windowTitle = config.Title or "SCRIPT MENU"
+    local windowTitle = config.Title or "LUISITO"
     local themeColor = config.ThemeColor or Color3.fromRGB(168, 85, 247)
     
     local self = setmetatable({}, Library)
@@ -58,10 +58,9 @@ function Library:CreateWindow(config)
     MainStroke.Thickness = 1.5
     MainStroke.Parent = MainFrame
 
-    local dragging, dragInput, dragStart, startPos
     local TopBar = Instance.new("Frame")
     TopBar.Name = "TopBar"
-    TopBar.Size = UDim2.new(1, 0, 0, 40)
+    TopBar.Size = UDim2.new(1, 0, 0, 45)
     TopBar.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
     TopBar.BorderSizePixel = 0
     TopBar.Parent = MainFrame
@@ -71,19 +70,38 @@ function Library:CreateWindow(config)
     TopCorner.Parent = TopBar
 
     local TitleLabel = Instance.new("TextLabel")
-    TitleLabel.Size = UDim2.new(1, -100, 1, 0)
-    TitleLabel.Position = UDim2.new(0, 15, 0, 0)
+    TitleLabel.Size = UDim2.new(0, 120, 1, 0)
+    TitleLabel.Position = UDim2.new(0, 12, 0, 0)
     TitleLabel.BackgroundTransparency = 1
     TitleLabel.Text = windowTitle
-    TitleLabel.TextColor3 = Color3.fromRGB(240, 240, 240)
+    TitleLabel.TextColor3 = themeColor
     TitleLabel.TextSize = 16
     TitleLabel.Font = Enum.Font.GothamBold
     TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
     TitleLabel.Parent = TopBar
 
+    local MapBarScroll = Instance.new("ScrollingFrame")
+    MapBarScroll.Name = "MapBarScroll"
+    MapBarScroll.Size = UDim2.new(0, 260, 0, 32)
+    MapBarScroll.Position = UDim2.new(0, 125, 0, 6)
+    MapBarScroll.BackgroundTransparency = 1
+    MapBarScroll.ScrollBarThickness = 0
+    MapBarScroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+    MapBarScroll.Parent = TopBar
+
+    local MapListLayout = Instance.new("UIListLayout")
+    MapListLayout.FillDirection = Enum.FillDirection.Horizontal
+    MapListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    MapListLayout.Padding = UDim.new(0, 6)
+    MapListLayout.Parent = MapBarScroll
+
+    MapListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        MapBarScroll.CanvasSize = UDim2.new(0, MapListLayout.AbsoluteContentSize.X + 10, 0, 0)
+    end)
+
     local CloseBtn = Instance.new("TextButton")
     CloseBtn.Size = UDim2.new(0, 30, 0, 30)
-    CloseBtn.Position = UDim2.new(1, -35, 0, 5)
+    CloseBtn.Position = UDim2.new(1, -35, 0, 7)
     CloseBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 38)
     CloseBtn.Text = "-"
     CloseBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
@@ -95,34 +113,7 @@ function Library:CreateWindow(config)
     CloseCorner.CornerRadius = UDim.new(0, 6)
     CloseCorner.Parent = CloseBtn
 
-    local OpenToggleBtn = Instance.new("TextButton")
-    OpenToggleBtn.Name = "HUD_OpenToggle"
-    OpenToggleBtn.Size = UDim2.new(0, 45, 0, 45)
-    OpenToggleBtn.Position = UDim2.new(0.05, 0, 0.15, 0)
-    OpenToggleBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
-    OpenToggleBtn.Text = "HUD"
-    OpenToggleBtn.TextColor3 = themeColor
-    OpenToggleBtn.TextSize = 14
-    OpenToggleBtn.Font = Enum.Font.GothamBold
-    OpenToggleBtn.Parent = self.ScreenGui
-
-    local ToggleCorner = Instance.new("UICorner")
-    ToggleCorner.CornerRadius = UDim.new(0, 22)
-    ToggleCorner.Parent = OpenToggleBtn
-
-    local ToggleStroke = Instance.new("UIStroke")
-    ToggleStroke.Color = themeColor
-    ToggleStroke.Thickness = 2
-    ToggleStroke.Parent = OpenToggleBtn
-
-    OpenToggleBtn.MouseButton1Click:Connect(function()
-        MainFrame.Visible = not MainFrame.Visible
-    end)
-
-    CloseBtn.MouseButton1Click:Connect(function()
-        MainFrame.Visible = false
-    end)
-
+    local dragging, dragInput, dragStart, startPos
     TopBar.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
@@ -149,10 +140,77 @@ function Library:CreateWindow(config)
         end
     end)
 
+    local OpenToggleBtn = Instance.new("TextButton")
+    OpenToggleBtn.Name = "HUD_OpenToggle"
+    OpenToggleBtn.Size = UDim2.new(0, 50, 0, 50)
+    OpenToggleBtn.Position = UDim2.new(0.05, 0, 0.2, 0)
+    OpenToggleBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
+    OpenToggleBtn.Text = windowTitle
+    OpenToggleBtn.TextColor3 = themeColor
+    OpenToggleBtn.TextSize = 9
+    OpenToggleBtn.Font = Enum.Font.GothamBold
+    OpenToggleBtn.Parent = self.ScreenGui
+
+    local ToggleCorner = Instance.new("UICorner")
+    ToggleCorner.CornerRadius = UDim.new(0, 25)
+    ToggleCorner.Parent = OpenToggleBtn
+
+    local ToggleStroke = Instance.new("UIStroke")
+    ToggleStroke.Color = themeColor
+    ToggleStroke.Thickness = 2
+    ToggleStroke.Parent = OpenToggleBtn
+
+    local btnDragging, btnDragStart, btnStartPos, btnDragInput
+    OpenToggleBtn.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            btnDragging = true
+            btnDragStart = input.Position
+            btnStartPos = OpenToggleBtn.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    btnDragging = false
+                end
+            end)
+        end
+    end)
+
+    OpenToggleBtn.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            btnDragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == btnDragInput and btnDragging then
+            local delta = input.Position - btnDragStart
+            OpenToggleBtn.Position = UDim2.new(btnStartPos.X.Scale, btnStartPos.X.Offset + delta.X, btnStartPos.Y.Scale, btnStartPos.Y.Offset + delta.Y)
+        end
+    end)
+
+    local wasDragged = false
+    OpenToggleBtn.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            wasDragged = false
+        end
+    end)
+    OpenToggleBtn.InputChanged:Connect(function()
+        wasDragged = true
+    end)
+
+    OpenToggleBtn.MouseButton1Click:Connect(function()
+        if not wasDragged then
+            MainFrame.Visible = not MainFrame.Visible
+        end
+    end)
+
+    CloseBtn.MouseButton1Click:Connect(function()
+        MainFrame.Visible = false
+    end)
+
     local Sidebar = Instance.new("Frame")
     Sidebar.Name = "Sidebar"
-    Sidebar.Size = UDim2.new(0, 150, 1, -40)
-    Sidebar.Position = UDim2.new(0, 0, 0, 40)
+    Sidebar.Size = UDim2.new(0, 140, 1, -45)
+    Sidebar.Position = UDim2.new(0, 0, 0, 45)
     Sidebar.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
     Sidebar.BorderSizePixel = 0
     Sidebar.Parent = MainFrame
@@ -177,8 +235,8 @@ function Library:CreateWindow(config)
 
     local ContentArea = Instance.new("Frame")
     ContentArea.Name = "ContentArea"
-    ContentArea.Size = UDim2.new(1, -150, 1, -40)
-    ContentArea.Position = UDim2.new(0, 150, 0, 40)
+    ContentArea.Size = UDim2.new(1, -140, 1, -45)
+    ContentArea.Position = UDim2.new(0, 140, 0, 45)
     ContentArea.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
     ContentArea.BorderSizePixel = 0
     ContentArea.Parent = MainFrame
@@ -186,9 +244,38 @@ function Library:CreateWindow(config)
     self.MainFrame = MainFrame
     self.TabScroll = TabScroll
     self.ContentArea = ContentArea
+    self.MapBarScroll = MapBarScroll
     self.ThemeColor = themeColor
 
     return self
+end
+
+function Library:CreateMapButton(mapName, callback)
+    callback = callback or function() end
+    local MapBtn = Instance.new("TextButton")
+    MapBtn.Size = UDim2.new(0, 80, 1, 0)
+    MapBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+    MapBtn.Text = mapName
+    MapBtn.TextColor3 = Color3.fromRGB(200, 200, 210)
+    MapBtn.TextSize = 11
+    MapBtn.Font = Enum.Font.GothamMedium
+    MapBtn.Parent = self.MapBarScroll
+
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 6)
+    Corner.Parent = MapBtn
+
+    MapBtn.MouseButton1Click:Connect(function()
+        for _, child in ipairs(self.MapBarScroll:GetChildren()) do
+            if child:IsA("TextButton") then
+                child.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
+                child.TextColor3 = Color3.fromRGB(200, 200, 210)
+            end
+        end
+        MapBtn.BackgroundColor3 = self.ThemeColor
+        MapBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        callback()
+    end)
 end
 
 function Library:CreateTab(tabName)
@@ -201,7 +288,7 @@ function Library:CreateTab(tabName)
     TabBtn.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
     TabBtn.Text = tabName
     TabBtn.TextColor3 = Color3.fromRGB(160, 160, 175)
-    TabBtn.TextSize = 13
+    TabBtn.TextSize = 12
     TabBtn.Font = Enum.Font.GothamMedium
     TabBtn.Parent = self.TabScroll
 
