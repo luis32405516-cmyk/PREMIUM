@@ -115,7 +115,7 @@ function Library:CreateWindow(config)
 
     local MapBarScroll = Instance.new("ScrollingFrame")
     MapBarScroll.Name = "MapBarScroll"
-    MapBarScroll.Size = UDim2.new(0, 260, 0, 32)
+    MapBarScroll.Size = UDim2.new(0, 380, 0, 32)
     MapBarScroll.Position = UDim2.new(0, 125, 0, 6)
     MapBarScroll.BackgroundTransparency = 1
     MapBarScroll.ScrollBarThickness = 0
@@ -246,6 +246,7 @@ function Library:CreateWindow(config)
     Sidebar.Position = UDim2.new(0, 0, 0, 45)
     Sidebar.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
     Sidebar.BorderSizePixel = 0
+    Sidebar.Visible = false
     Sidebar.Parent = MainFrame
 
     local TabScroll = Instance.new("ScrollingFrame")
@@ -275,6 +276,7 @@ function Library:CreateWindow(config)
     ContentArea.Parent = MainFrame
 
     self.MainFrame = MainFrame
+    self.Sidebar = Sidebar
     self.TabScroll = TabScroll
     self.ContentArea = ContentArea
     self.MapBarScroll = MapBarScroll
@@ -288,7 +290,7 @@ function Library:CreateMapButton(mapName, allowedTabs, callback)
     callback = callback or function() end
 
     local MapBtn = Instance.new("TextButton")
-    MapBtn.Size = UDim2.new(0, 80, 1, 0)
+    MapBtn.Size = UDim2.new(0, 90, 1, 0)
     MapBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
     MapBtn.Text = mapName
     MapBtn.TextColor3 = Color3.fromRGB(200, 200, 210)
@@ -298,10 +300,10 @@ function Library:CreateMapButton(mapName, allowedTabs, callback)
 
     local Corner = Instance.new("UICorner")
     Corner.CornerRadius = UDim.new(0, 6)
-    Corner.CornerRadius = UDim.new(0, 6)
     Corner.Parent = MapBtn
 
     MapBtn.MouseButton1Click:Connect(function()
+        -- Resetear el color de los botones de arriba
         for _, child in ipairs(self.MapBarScroll:GetChildren()) do
             if child:IsA("TextButton") then
                 child.BackgroundColor3 = Color3.fromRGB(30, 30, 40)
@@ -311,7 +313,10 @@ function Library:CreateMapButton(mapName, allowedTabs, callback)
         MapBtn.BackgroundColor3 = self.ThemeColor
         MapBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 
+        -- Desvanecer/Ocultar todas las pestañas y sus contenidos
         local firstVisibleTab = nil
+        local hasAllowedTabs = false
+
         for _, tab in ipairs(self.Tabs) do
             local isAllowed = false
             for _, allowed in ipairs(allowedTabs) do
@@ -326,52 +331,30 @@ function Library:CreateMapButton(mapName, allowedTabs, callback)
             tab.Button.BackgroundColor3 = Color3.fromRGB(25, 25, 32)
             tab.Button.TextColor3 = Color3.fromRGB(160, 160, 175)
 
-            if isAllowed and not firstVisibleTab then
-                firstVisibleTab = tab
+            if isAllowed then
+                hasAllowedTabs = true
+                if not firstVisibleTab then
+                    firstVisibleTab = tab
+                end
             end
         end
 
-        if firstVisibleTab then
-            firstVisibleTab.Container.Visible = true
-            firstVisibleTab.Button.BackgroundColor3 = self.ThemeColor
-            firstVisibleTab.Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        -- Mostrar u ocultar la barra lateral según la disponibilidad de pestañas
+        if hasAllowedTabs then
+            self.Sidebar.Visible = true
+            if firstVisibleTab then
+                firstVisibleTab.Container.Visible = true
+                firstVisibleTab.Button.BackgroundColor3 = self.ThemeColor
+                firstVisibleTab.Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            end
+        else
+            self.Sidebar.Visible = false
         end
 
         callback()
     end)
 
     table.insert(self.MapButtons, MapBtn)
-    
-    if #self.MapButtons == 1 then
-        task.spawn(function()
-            task.wait(0.1)
-            MapBtn.BackgroundColor3 = self.ThemeColor
-            MapBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-            
-            local firstVisibleTab = nil
-            for _, tab in ipairs(self.Tabs) do
-                local isAllowed = false
-                for _, allowed in ipairs(allowedTabs) do
-                    if tab == allowed then
-                        isAllowed = true
-                        break
-                    end
-                end
-
-                tab.Button.Visible = isAllowed
-                tab.Container.Visible = false
-                if isAllowed and not firstVisibleTab then
-                    firstVisibleTab = tab
-                end
-            end
-
-            if firstVisibleTab then
-                firstVisibleTab.Container.Visible = true
-                firstVisibleTab.Button.BackgroundColor3 = self.ThemeColor
-                firstVisibleTab.Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-            end
-        end)
-    end
 end
 
 function Library:CreateTab(tabName)
@@ -386,6 +369,7 @@ function Library:CreateTab(tabName)
     TabBtn.TextColor3 = Color3.fromRGB(160, 160, 175)
     TabBtn.TextSize = 12
     TabBtn.Font = Enum.Font.GothamMedium
+    TabBtn.Visible = false
     TabBtn.Parent = self.TabScroll
 
     local TabBtnCorner = Instance.new("UICorner")
