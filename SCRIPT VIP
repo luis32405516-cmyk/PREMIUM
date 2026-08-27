@@ -1,0 +1,11 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/luis32405516-cmyk/PREMIUM/refs/heads/main/LIBRARY%20VIP"))()
+
+local Window = Library:CreateWindow({
+    Title = "AURA PINK HUB",
+    ThemeColor = Color3.fromRGB(168, 85, 247)
+})
+
+local Mundo1 = Window:CreateTab("Mundo 1")
+Mundo1:AddButton("Test Boton", function()
+    print("Funciona perfectamente!")
+end)
